@@ -1,0 +1,70 @@
+image: nikolaik/python-nodejs:python3.7-nodejs14
+
+cache:
+  key: node_modules_cache
+  paths:
+    - node_modules/
+
+stages:
+  - build
+  - test
+
+install dependencies:
+  stage: build
+  artifacts:
+    expire_in: 1 week
+    paths:
+      - backend/node_modules
+      - frontend/node_modules
+  script:
+    - cd backend && npm ci && cd ..
+    - echo "Installation complete."
+
+run unit test:
+  stage: test
+  script:
+    - cd backend && npm run test:unit && cd ..
+  dependencies:
+    - install dependencies
+  except:
+    - /release-*/
+    - develop
+
+run integration tests:
+  stage: test
+  services:
+    - postgres:13.3
+  variables:
+    TEST_PG_NAME: quiz_db_test
+    TEST_PG_USER: quiz_user
+    TEST_PG_PASSWORD: testing
+    TEST_PG_HOST: localhost
+  script:
+    - echo "$TEST_PG_NAME"
+    - cd backend && npm run test:integration && cd .. 
+  dependencies:
+    - install dependencies
+  except:
+    - /release-*/
+    - develop
+
+check lint:
+  stage: test
+  script:
+    - cd backend && npm run check-lint
+  dependencies:
+    - install dependencies
+  except:
+    - /release-*/
+    - develop
+
+check typescript:
+  stage: test
+  script:
+    - cd backend && npm run build && cd ..
+    - cd frontend && npm run build && cd ..
+  dependencies:
+    - install dependencies
+  except:
+    - /release-*/
+    - develop
