@@ -61,8 +61,4 @@ export class AppLogger {
     });
   }
 
-  public static createLogger(moduleName: string) {
-    const logger = new AppLogger(moduleName);
-    return logger;
-  }
 }

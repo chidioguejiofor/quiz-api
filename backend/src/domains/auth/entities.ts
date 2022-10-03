@@ -6,3 +6,9 @@ export interface UserEntity extends BaseEntity {
   password: string;
   email: string;
 }
+
+export interface SessionEntity extends BaseEntity {
+  userId: string;
+  email: string;
+  expiresAt?: Date | string;
+}
