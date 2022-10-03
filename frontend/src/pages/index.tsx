@@ -1,7 +1,8 @@
+import { LandingPage } from "components/LandingPage";
 import type { NextPage } from "next";
 
 const Home: NextPage = () => {
-  return <div className="bg-blue-500">Hello</div>;
+  return <LandingPage />;
 };
 
 export default Home;
