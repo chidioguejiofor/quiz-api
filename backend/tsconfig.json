@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "target": "es6", // or a more recent ecmascript version
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "module": "Node16", /* Specify what module code is generated. */
+    "rootDir": "./src",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true, /* Enable all strict type-checking options. */
+    "strictPropertyInitialization": false,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "outDir": "dist",
+    "allowUnreachableCode": true,
+    "skipLibCheck": true,
+    "allowJs": true,
+    "baseUrl": "./src",
+  },
+  "include": [
+    "./src/**/*.ts",
+    "./src/**/*.js",
+    "./src/**/*.json"
+  ],
+  "exclude": [
+    "node_modules",
+    "scripts",
+    "templates",
+    "dist",
+  ]
+}
