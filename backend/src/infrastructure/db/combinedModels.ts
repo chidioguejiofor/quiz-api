@@ -1,5 +1,5 @@
-import { User } from "domains/auth/models";
+import { User, Session } from "domains/auth/models";
 
-export const combinedModels = [User];
+export const combinedModels = [User, Session];
 
 export default combinedModels;
