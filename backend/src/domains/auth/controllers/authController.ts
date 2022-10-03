@@ -2,8 +2,18 @@ import { Request, Response } from "express";
 import { InvalidInputData } from "shared/errors";
 import { AppLogger } from "shared/logger";
 import { handleUnknownError } from "shared/utils/errorHandlers";
-import { UserExists, UserNotFound } from "../errors";
-import { loginUsecase, registerUsecase } from "../usecases";
+import {
+  InvalidSession,
+  SessionExpired,
+  UserExists,
+  UserNotFound,
+} from "../errors";
+import { RefreshTokenInput } from "../types";
+import {
+  loginUsecase,
+  refreshTokenUsecase,
+  registerUsecase,
+} from "../usecases";
 
 const logger = AppLogger.create("Auth Controller");
 
@@ -61,6 +71,45 @@ export class AuthController {
         return res
           .status(409)
           .json({ message: `User with email ${req.body.email} exists` });
+      }
+
+      return handleUnknownError(res, {
+        error,
+        logger,
+      });
+    }
+  }
+
+  public static async refreshToken(
+    req: Request<unknown, unknown, RefreshTokenInput>,
+    res: Response
+  ) {
+    const { accessToken, refreshToken } = req.body;
+    try {
+      const newAccessToken = await refreshTokenUsecase.execute(
+        accessToken || "",
+        refreshToken || ""
+      );
+      return res.status(201).json({
+        accessToken: newAccessToken,
+      });
+    } catch (error) {
+      if (error instanceof InvalidInputData) {
+        return res.status(400).json({
+          message: "Invalid input",
+        });
+      }
+
+      if (error instanceof InvalidSession) {
+        return res.status(400).json({
+          message: "Invalid tokens",
+        });
+      }
+
+      if (error instanceof SessionExpired) {
+        return res.status(403).json({
+          message: "Expired session. Please login again",
+        });
       }
 
       return handleUnknownError(res, {
