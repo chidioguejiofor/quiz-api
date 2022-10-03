@@ -1,7 +1,8 @@
+import React from "react";
 import { Button } from "components/Button";
 import { Typography } from "components/Typography";
-import { marketing } from "constants/pages/landing";
-import React from "react";
+import { marketing } from "constants/copy/landing";
+import { pages } from "constants/pages";
 
 export default function MarkettingMessage() {
   return (
@@ -21,7 +22,9 @@ export default function MarkettingMessage() {
             </div>
 
             <div>
-              <Button href="/page2">{marketing.btnLabel}</Button>
+              <Button size="lg" href={pages.register}>
+                {marketing.btnLabel}
+              </Button>
             </div>
           </div>
         </div>

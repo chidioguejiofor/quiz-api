@@ -1,8 +1,8 @@
-import { LandingPage } from "components/layouts/LandingPage";
+import { Login } from "components/layouts/auth/Login";
 import type { NextPage } from "next";
 
 const Home: NextPage = () => {
-  return <LandingPage />;
+  return <Login />;
 };
 
 export default Home;
