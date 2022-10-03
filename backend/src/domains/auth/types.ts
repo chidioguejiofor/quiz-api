@@ -4,3 +4,8 @@ export type RegisterRequestType = {
   email: string;
   password: string;
 };
+
+export type RefreshTokenInput = {
+  accessToken: string;
+  refreshToken: string;
+};
