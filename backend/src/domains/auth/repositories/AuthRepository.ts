@@ -3,6 +3,10 @@ import { User } from "../models";
 import { UserNotFound } from "../errors";
 
 export class AuthRepository {
+  public static getUserById(userId: string) {
+    return User.findOne({ where: { id: userId } });
+  }
+
   public static getUserByEmail(email: string) {
     return User.findOne({ where: { email } });
   }

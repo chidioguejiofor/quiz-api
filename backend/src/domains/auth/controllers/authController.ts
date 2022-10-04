@@ -1,9 +1,12 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { InvalidInputData } from "shared/errors";
 import { AppLogger } from "shared/logger";
+import { AuthRequest } from "shared/types";
 import { handleUnknownError } from "shared/utils/errorHandlers";
 import {
+  BaseAuthError,
   InvalidSession,
+  MustBeLoggedIn,
   SessionExpired,
   UserExists,
   UserNotFound,
@@ -13,14 +16,52 @@ import {
   loginUsecase,
   refreshTokenUsecase,
   registerUsecase,
+  tokenVerifyUsecase,
 } from "../usecases";
 
 const logger = AppLogger.create("Auth Controller");
 
+type MiddlewareType = "call-next-on-error" | "return-401-on-error";
+
 export class AuthController {
-  public static hello(req: Request, res: Response) {
-    logger.info("hello from authentication");
-    return res.status(200).json({ message: "Hello we are here" });
+  static tokenMiddleware(action: MiddlewareType = "return-401-on-error") {
+    return async function (
+      req: AuthRequest,
+      res: Response,
+      next: NextFunction
+    ) {
+      const authorization = req.headers.authorization;
+      try {
+        const decoded = await tokenVerifyUsecase.execute(
+          authorization as string
+        );
+        req.decoded = decoded;
+
+        return next();
+      } catch (error) {
+        if (error instanceof BaseAuthError && action === "call-next-on-error") {
+          return next();
+        }
+        if (
+          error instanceof MustBeLoggedIn ||
+          error instanceof InvalidSession
+        ) {
+          return res.status(401).json({
+            messsage: "You must be logged in to access this",
+          });
+        }
+        if (error instanceof SessionExpired) {
+          return res.status(401).json({
+            message: "Your session has expired please try again",
+          });
+        }
+
+        return handleUnknownError(res, {
+          error,
+          logger,
+        });
+      }
+    };
   }
 
   public static login = async (req: Request, res: Response) => {
