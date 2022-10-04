@@ -1,6 +1,7 @@
-import { Table, Column, ForeignKey } from "sequelize-typescript";
+import { Table, Column, ForeignKey, HasMany } from "sequelize-typescript";
 import { BaseModel } from "shared/BaseModel";
 import { QuestionEntity } from "../entities";
+import { Option } from "./option";
 import { Quiz } from "./quiz";
 
 @Table({
@@ -24,4 +25,13 @@ export class Question extends BaseModel<QuestionEntity> {
     field: "image_url",
   })
   imageURL: string;
+
+  @Column({
+    allowNull: false,
+    field: "number_of_answers",
+  })
+  numberOfAnswers: number;
+
+  @HasMany(() => Option)
+  options: Option[];
 }

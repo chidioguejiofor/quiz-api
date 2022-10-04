@@ -1,4 +1,4 @@
-import { QuizRepositoryType } from "../repositories/index";
+import { QuizRepositoryType } from "../repositories";
 
 export class GetUserQuizUsecase {
   constructor(private quizRepository: QuizRepositoryType) {}

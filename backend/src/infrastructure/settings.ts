@@ -14,7 +14,7 @@ export const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS || "*";
 export const JWT_TOKEN_SETTINGS = {
   jwtTokenSecret: process.env.JWT_TOKEN_SECRET as string,
   accessTokenDuration: +(
-    process.env.ACCESS_TOKEN_EXP_TIME_IN_SECONDS || 5 * 60
+    process.env.ACCESS_TOKEN_EXP_TIME_IN_SECONDS || 50 * 60
   ),
   refreshTokenDuration: +(
     process.env.REFRESH_TOKEN_EXPIRY_TIME || 365.25 * 24 * 60 * 60

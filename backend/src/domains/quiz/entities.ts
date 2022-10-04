@@ -10,10 +10,12 @@ export interface QuizEntity extends BaseEntity {
 export interface QuestionEntity extends BaseEntity {
   title: string;
   quizId: string;
-  iamgeURL?: string;
+  imageURL?: string;
+  numberOfAnswers: number;
 }
 
 export interface OptionEntity extends BaseEntity {
   text: string;
   isAnswer: boolean;
+  questionId: string;
 }

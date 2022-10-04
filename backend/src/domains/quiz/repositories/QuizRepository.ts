@@ -1,5 +1,7 @@
-import { QuizEntity } from "../entities";
+import { OptionEntity, QuestionEntity, QuizEntity } from "../entities";
 import { QuizNotFound } from "../errors";
+import { Question } from "../models/question";
+import { Option } from "../models/option";
 import { Quiz } from "../models/quiz";
 
 export class QuizRepository {
@@ -17,10 +19,27 @@ export class QuizRepository {
     });
   }
 
+  public static async fetchQuestions(
+    quizId: string
+  ): Promise<QuestionEntity[]> {
+    return Question.findAll({
+      where: {
+        quizId,
+      },
+      include: [
+        {
+          model: Option,
+          attributes: ["text", "isAnswer"],
+        },
+      ],
+    });
+  }
+
   public static async getQuiz(
     authorId: string,
     quizId: string
   ): Promise<QuizEntity | null> {
+    console.log("Quiz id==>", quizId);
     return Quiz.findOne({
       where: {
         authorId,
@@ -42,6 +61,16 @@ export class QuizRepository {
     if (!deleted) {
       throw new QuizNotFound();
     }
+  }
+
+  public static async createQuestion(
+    input: QuestionEntity
+  ): Promise<QuestionEntity> {
+    return Question.create(input);
+  }
+
+  public static async addQuestionOptions(options: OptionEntity[]) {
+    return Option.bulkCreate(options);
   }
 }
 

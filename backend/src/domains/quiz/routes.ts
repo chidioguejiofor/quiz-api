@@ -4,6 +4,19 @@ import { QuizController } from "./controllers";
 const router = Router();
 
 router.post("/quiz", authAPI.tokenMiddleware(), QuizController.createQuiz);
+
+router.get(
+  "/user/quiz/:quizId/questions",
+  authAPI.tokenMiddleware(),
+  QuizController.retrieveQuestions
+);
+
+router.post(
+  "/quiz/questions",
+  authAPI.tokenMiddleware(),
+  QuizController.addQuestionToQuiz
+);
+
 router.get(
   "/user/quiz",
   authAPI.tokenMiddleware(),
