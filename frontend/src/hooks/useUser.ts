@@ -11,12 +11,13 @@ export const useUser = (): [User | null, string] => {
 
   let user = null;
   if (data?.user) {
-    const userData = (data.user as any).data;
+    const json = data.user as any;
+    const userData = json.data;
     user = {
       firstName: userData.firstName,
       lastName: userData.lastName,
       email: userData.email,
-      token: userData.accessToken,
+      token: json.accessToken,
     } as User;
   }
 

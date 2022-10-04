@@ -1,13 +1,15 @@
 import React from "react";
 
 export type InputProps = {
-  type?: "text" | "password"|"email";
+  type?: "text" | "password" | "email";
   name: string;
   placeholder?: string;
+  required?: boolean;
 };
 export function Input(props: InputProps) {
   return (
     <input
+      required={props.required}
       name={props.name}
       type={props.type}
       placeholder={props.placeholder}

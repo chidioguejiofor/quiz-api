@@ -1,6 +1,6 @@
 import React, { SyntheticEvent } from "react";
 import { Header } from "components/Header";
-import { AuthInput } from "./AuthInput";
+import { FormInput } from "./FormInput";
 import { AuthForm } from "./AuthForm";
 import { pages } from "constants/pages";
 import { Auth } from "core/api/Auth";
@@ -31,21 +31,21 @@ export function Signup() {
         bottomText="Already have an account?"
         onSubmit={handleSubmit}
       >
-        <AuthInput
+        <FormInput
           type="text"
           name="firstName"
           placeholder="Enter first name"
         />
 
-        <AuthInput type="text" name="lastName" placeholder="Enter last name" />
+        <FormInput type="text" name="lastName" placeholder="Enter last name" />
 
-        <AuthInput
+        <FormInput
           type="email"
           name="email"
           placeholder="Enter email address"
         />
 
-        <AuthInput
+        <FormInput
           placeholder="Enter a valid password"
           type="password"
           name="password"

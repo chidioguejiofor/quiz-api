@@ -7,7 +7,7 @@ function MyApp({
   pageProps: { session, ...pageProps },
 }: AppProps<any>) {
   return (
-    <SessionProvider session={session} refetchInterval={5 * 60}>
+    <SessionProvider session={session}>
       <Component {...pageProps} />
     </SessionProvider>
   );

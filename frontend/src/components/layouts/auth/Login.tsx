@@ -1,7 +1,7 @@
 import React, { SyntheticEvent } from "react";
 import { signIn } from "next-auth/react";
 import { Header } from "components/Header";
-import { AuthInput } from "./AuthInput";
+import { FormInput } from "./FormInput";
 import { AuthForm } from "./AuthForm";
 import { pages } from "constants/pages";
 import { useRouter } from "next/router";
@@ -29,13 +29,13 @@ export function Login() {
         bottomText="Don't have an account?"
         onSubmit={handleSubmit}
       >
-        <AuthInput
+        <FormInput
           type="email"
           name="email"
           placeholder="Enter email address"
         />
 
-        <AuthInput
+        <FormInput
           placeholder="Enter a valid password"
           type="password"
           name="password"
