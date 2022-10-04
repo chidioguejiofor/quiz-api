@@ -25,7 +25,13 @@ export class LoginUsecase {
     return {
       accessToken,
       refreshToken,
-      data: user,
+      data: {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        sessionId: session.id,
+      },
     };
   }
 
