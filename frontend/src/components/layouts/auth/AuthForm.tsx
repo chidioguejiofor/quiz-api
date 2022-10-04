@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, SyntheticEvent } from "react";
 import Link from "next/link";
 import { Button } from "components/Button";
 import { Typography } from "components/Typography";
@@ -10,12 +10,21 @@ type AuthFormProps = {
   linkLabel: string;
   linkHref: string;
   bottomText: string;
+  onSubmit: (e: SyntheticEvent<HTMLFormElement>) => void;
 };
 export function AuthForm(props: AuthFormProps) {
-  const { title, subtitle, children, linkLabel, linkHref, bottomText } = props;
+  const {
+    title,
+    subtitle,
+    children,
+    linkLabel,
+    linkHref,
+    bottomText,
+    onSubmit,
+  } = props;
   return (
     <div className="flex justify-center px-8 items-center h-full mt-8">
-      <form className="65vw">
+      <form className="65vw" onSubmit={onSubmit}>
         <div className="mt-10 text-center md:text-left">
           <Typography type="h2" mobileType="h3">
             {title}
