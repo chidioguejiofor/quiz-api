@@ -3,7 +3,7 @@ import { getSession } from "next-auth/react";
 
 import { GetServerSidePropsContext } from "next";
 import React from "react";
-import { useUser } from "hooks/useUser";
+import { HomePage } from "components/layouts/Home";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const session = await getSession(context);
@@ -21,12 +21,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 }
 
 function Home() {
-  const [user] = useUser();
-  return (
-    <div>
-      Welcome Home!! {user?.firstName} {user?.lastName}
-    </div>
-  );
+  return <HomePage />;
 }
 
 export default Home;
