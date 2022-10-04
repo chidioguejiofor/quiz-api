@@ -12,7 +12,7 @@ export class Option extends BaseModel<OptionEntity> {
     allowNull: false,
     field: "question_id",
   })
-  questionid: string;
+  questionId: string;
 
   @Column({
     allowNull: false,
