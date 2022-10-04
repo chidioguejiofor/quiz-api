@@ -1,5 +1,4 @@
 import sinon from "sinon";
-import { AuthRepository, SessionManager } from "../repositories/index";
+import { QuizRepository } from "../repositories";
 
-export const mockAuthRepo = sinon.stub(AuthRepository);
-export const mockSessionManager = sinon.stub(SessionManager);
+export const mockQuizRepo = sinon.stub(QuizRepository);
