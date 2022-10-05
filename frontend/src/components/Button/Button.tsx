@@ -32,7 +32,7 @@ export function Button(props: ButtonProps) {
   const sizeClasses = BUTTON_SIZES[size];
   return (
     <Component
-      className={` px-10 text-black rounded-lg inline-grid place-items-center ${sizeClasses} ${outlinedStyles}`}
+      className={` px-4 text-black rounded-lg inline-grid place-items-center ${sizeClasses} ${outlinedStyles}`}
       onClick={onClick}
       href={href}
       type={htmlType}

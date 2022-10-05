@@ -5,7 +5,11 @@ export function useMakeAPICall<T>(
   endpoint: string | null,
   args: FetcherArgs["args"] = {}
 ) {
-  const { data, error, mutate } = useSWR<T>({ endpoint, args }, fetcher, {
+  const {
+    data: json,
+    error,
+    mutate,
+  } = useSWR<T>({ endpoint, args }, fetcher, {
     revalidateOnMount: false,
     revalidateOnFocus: false,
   });
@@ -16,8 +20,8 @@ export function useMakeAPICall<T>(
   };
 
   return {
-    data,
-    loading: !data,
+    json,
+    loading: !json,
     error,
     refetch,
   };

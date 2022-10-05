@@ -12,3 +12,27 @@ export type BackendResponse<T> = {
   message: string;
   data: T[];
 };
+
+type Option = {
+  id?: string;
+  text: string;
+  isAnswer: boolean;
+};
+
+export type QuestionData = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  quizId: string;
+  title: string;
+  imageURL?: string | null;
+  numberOfAnswers: number;
+  options: Option[];
+};
+
+export type QuestionInput = {
+  quizId: string;
+  title: string;
+  imageURL?: string;
+  options: Option[];
+};
