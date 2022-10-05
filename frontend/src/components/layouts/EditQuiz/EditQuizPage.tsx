@@ -1,6 +1,7 @@
 import { Button } from "components/Button";
 import { Header } from "components/Header";
 import { Typography } from "components/Typography";
+import { Quiz } from "core/api/Quiz";
 import { useMakeAPICall } from "core/api/useResource";
 import { BackendResponse, QuestionData, QuestionInput } from "core/models/quiz";
 import { useUser } from "hooks/useUser";
@@ -95,6 +96,8 @@ export function EditQuizPage() {
     };
 
   const addNewQuestion = () => {
+    setExpandedItem(questions.length);
+
     setQuestions([
       ...questions,
       {
@@ -117,6 +120,31 @@ export function EditQuizPage() {
     }
   };
 
+  const saveQuestion = async (e: SyntheticEvent, qIndex: number) => {
+    e.preventDefault();
+
+    const question = questions[qIndex];
+    const hasAtLeastOneAnswer = question.options.some(
+      (option) => option.isAnswer
+    );
+    if (!hasAtLeastOneAnswer) {
+      alert("Must contain at least one answer");
+      return;
+    }
+
+    try {
+      const newQuestion = await Quiz.createQuestion(
+        question as QuestionInput,
+        user?.token as string
+      );
+
+      questions[qIndex] = newQuestion.data;
+      setQuestions([...questions]);
+      setExpandedItem(-1);
+    } catch (error) {
+      alert("error occured");
+    }
+  };
   return (
     <div>
       <Header />
@@ -129,6 +157,7 @@ export function EditQuizPage() {
 
           <Accordion id="questions">
             <EditQuestionItems
+              onSubmit={saveQuestion}
               questions={questions}
               expandedIndex={expandedItem}
               onItemClick={handleAccordionClick}

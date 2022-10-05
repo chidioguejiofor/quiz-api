@@ -10,6 +10,7 @@ type EditQuestionItemProps = {
   onOptionChange: (qIndex: number) => (newOption: any, index: number) => void;
   onAddOption: (qIndex: number) => () => void;
   onRemoveOption: (qIndex: number) => (index: number) => void;
+  onSubmit: (e: SyntheticEvent, qIndex: number) => void;
 };
 export function EditQuestionItems(props: EditQuestionItemProps) {
   const {
@@ -20,6 +21,7 @@ export function EditQuestionItems(props: EditQuestionItemProps) {
     onAddOption,
     onRemoveOption,
     onOptionChange,
+    onSubmit,
   } = props;
 
   return (
@@ -38,6 +40,7 @@ export function EditQuestionItems(props: EditQuestionItemProps) {
             onClick={onItemClick(qIndex)}
           >
             <AddOptionsForm
+              onSubmit={(e) => onSubmit(e, qIndex)}
               onQuestionTitleChange={onQuestionTitleChange(qIndex)}
               questionTitle={question.title}
               options={question.options}

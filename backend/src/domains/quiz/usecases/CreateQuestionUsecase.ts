@@ -54,6 +54,11 @@ export class CreateQuestionUsecase {
       numberOfAnswers,
     });
     await this.quizRepository.addQuestionOptions(options);
+    const newQuestions = await this.quizRepository.fetchQuestions(
+      input.quizId as string,
+      questionId
+    );
+    return newQuestions[0];
   }
 
   private buildOptions(input: QuestionInput) {
