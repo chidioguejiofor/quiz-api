@@ -21,6 +21,7 @@ export default NextAuth({
         };
       } else {
         // refreshToken here
+        console.log(token);
         return token;
       }
     },
@@ -53,7 +54,7 @@ export default NextAuth({
             accessToken: json.accessToken,
             refreshToken: json.refreshToken,
             data: json.data,
-            accessTokenExpires: Date.now() + tokenData.exp * 1000,
+            accessTokenExpires: Date.now() + tokenData.exp,
           } as any;
         } catch (error) {
           console.log(error);

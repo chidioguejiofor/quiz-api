@@ -1,4 +1,4 @@
-import { QuestionCard } from "components/QuestionCard";
+import { QuizCard } from "components/QuestionCard";
 import { QuizData } from "core/models/quiz";
 import React from "react";
 
@@ -12,7 +12,7 @@ function CardSection(props: CardSectionProps) {
       {quizes && (
         <div className="grid justify-center md:justify-start grid-cols-[repeat(auto-fill,400px)] gap-8 ">
           {quizes.map((quiz) => (
-            <QuestionCard key={quiz.id} title={quiz.title} />
+            <QuizCard key={quiz.id} quizId={quiz.id} title={quiz.title} />
           ))}
         </div>
       )}

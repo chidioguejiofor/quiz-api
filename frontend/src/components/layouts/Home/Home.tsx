@@ -14,7 +14,7 @@ export function HomePage() {
   const token = user?.token;
 
   const [show, setShow] = useState(false);
-  const { data: quizesRes, refetch } = useMakeAPICall<
+  const { json: quizesRes, refetch } = useMakeAPICall<
     BackendResponse<QuizData>
   >(token ? "/user/quiz" : null, {
     token,
