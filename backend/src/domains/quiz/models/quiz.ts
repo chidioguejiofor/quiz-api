@@ -24,6 +24,12 @@ export class Quiz extends BaseModel<QuizEntity> {
   imageURL: string;
 
   @Column({
+    allowNull: true,
+    field: "permalink",
+  })
+  permalink: string;
+
+  @Column({
     allowNull: false,
     defaultValue: "draft",
   })
