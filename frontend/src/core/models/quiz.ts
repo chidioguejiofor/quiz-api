@@ -6,6 +6,7 @@ export type QuizData = {
   title: string;
   imageURL: null;
   status: string;
+  permalink?: string;
 };
 
 export type BackendResponse<T> = {

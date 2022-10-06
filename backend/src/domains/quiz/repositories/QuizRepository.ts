@@ -7,7 +7,7 @@ import { Quiz } from "../models/quiz";
 import { WhereOptions } from "sequelize";
 
 export class QuizRepository {
-  static async publishQuiz(quizId: string, authorId: string) {
+  static async publishQuiz(authorId: string, quizId: string) {
     const permalink = randomstring.generate({
       length: 6,
       charset: "alphanumeric",

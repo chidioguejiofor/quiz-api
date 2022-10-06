@@ -26,6 +26,8 @@ export function HomePage() {
     true
   );
 
+  console.log("user==>", user);
+
   const toggleShow = () => setShow(!show);
 
   const quizes = quizesRes?.data;
@@ -36,13 +38,13 @@ export function HomePage() {
     const form = e.target as HTMLFormElement;
     const formData = new FormData(form);
     const quizInput = formDataToJSON(formData);
-    await Quiz.createQuiz(quizInput, token);
+    await Quiz.create(quizInput, token);
     refetch();
     form.reset();
   };
 
   const handleDelete = async (quizId: string) => {
-    await Quiz.deleteQuiz(quizId, token);
+    await Quiz.delete(quizId, token);
     refetch();
   };
 
@@ -58,11 +60,17 @@ export function HomePage() {
           <QuizForm onSubmit={createQuiz} toggleShow={toggleShow} show={show} />
 
           {quizes?.length ? (
-            <CardSection onDelete={handleDelete} quizes={quizes} />
+            <CardSection
+              onDelete={handleDelete}
+              quizes={quizes}
+              currentUserId={user?.id}
+            />
           ) : null}
 
           {!quizes?.length && (
-            <Typography type="p_18">No quiz has been created yet. Please create your first Quiz</Typography>
+            <Typography type="p_18">
+              No quiz has been created yet. Please create your first Quiz
+            </Typography>
           )}
         </div>
       </div>

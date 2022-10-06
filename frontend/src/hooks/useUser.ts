@@ -1,6 +1,7 @@
 import { useSession } from "next-auth/react";
 
 type User = {
+  id: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -14,6 +15,7 @@ export const useUser = (): [User | null, string] => {
     const json = data.user as any;
     const userData = json.data;
     user = {
+      id: userData.id,
       firstName: userData.firstName,
       lastName: userData.lastName,
       email: userData.email,

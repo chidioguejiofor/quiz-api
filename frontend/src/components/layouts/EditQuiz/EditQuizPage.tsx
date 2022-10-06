@@ -14,10 +14,11 @@ import { useRouter } from "next/router";
 import React, { FormEvent, SyntheticEvent, useEffect, useState } from "react";
 
 import { EditQuestionAccordion } from "./EditQuestionAccordion";
-import QuestionControls from "./QuestionControls";
+import EditQuizControls from "./QuestionControls";
 import QuizControls from "./QuizControls";
 import { pages } from "constants/pages";
 import { Typography } from "components/Typography";
+import { Question as QuestionAPI } from "core/api/Question";
 
 type Option = {
   text: string;
@@ -78,7 +79,7 @@ export function EditQuizPage() {
   const handleDeleteQuestion = (questionIndex: number) => async () => {
     const question = questions[questionIndex];
     if ("id" in question) {
-      await Quiz.deleteQuestion(question, token as string);
+      await QuestionAPI.delete(question, token as string);
     }
 
     questions.splice(questionIndex, 1);
@@ -143,11 +144,16 @@ export function EditQuizPage() {
     ]);
   };
 
-  const publishQuiz = () => {
+  const publishQuiz = async () => {
     const hasUnsavedItems = questions.some((question) => !("id" in question));
     if (hasUnsavedItems) {
       toast.error("Cannot publish unsaved questions.");
+      return;
     }
+
+    const { message } = await Quiz.publish(quizId, token);
+    toast.success(message);
+    router.push(pages.home);
   };
 
   async function persistQuestion(qIndex: number, showError = true) {
@@ -169,9 +175,9 @@ export function EditQuizPage() {
     try {
       let newQuestion;
       if ("id" in question) {
-        newQuestion = await Quiz.updateQuestion(question, token as string);
+        newQuestion = await QuestionAPI.update(question, token as string);
       } else {
-        newQuestion = await Quiz.createQuestion(question, token as string);
+        newQuestion = await QuestionAPI.create(question, token as string);
       }
       if (!newQuestion.data) {
         toast.error("Error occured while saving question");
@@ -196,7 +202,7 @@ export function EditQuizPage() {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
     const title = formData.get("title") as string;
-    const { data } = await Quiz.updateQuiz(
+    const { data } = await Quiz.update(
       quizId,
       { ...quizJson?.data, title },
       token
@@ -210,10 +216,11 @@ export function EditQuizPage() {
   };
 
   const handleDeleteQuiz = async () => {
-    await Quiz.deleteQuiz(quizId, token);
+    await Quiz.delete(quizId, token);
     router.push(pages.home);
   };
 
+  const quiz = quizJson?.data;
   return (
     <div>
       <Header />
@@ -222,31 +229,42 @@ export function EditQuizPage() {
         <div className="w-full max-w-[1200px]">
           <QuizControls
             onUpdateQuiz={handleUpdateQuiz}
-            title={quizJson?.data.title || ""}
+            title={quiz?.title || ""}
             deleteQuiz={handleDeleteQuiz}
+            showControls={quiz?.status === "draft"}
           />
-          <div className="my-4">
-            <Typography type="p_16">
-              All your changes would be auto saved
+
+          {quiz?.status === "published" && (
+            <Typography type="h3">
+              This Quiz has already been published
             </Typography>
-          </div>
+          )}
 
-          <EditQuestionAccordion
-            onSubmit={saveQuestion}
-            questions={questions}
-            expandedIndex={expandedItem}
-            onItemClick={handleAccordionClick}
-            onQuestionTitleChange={handleQuestionTitleChange}
-            onAddOption={handleAddOption}
-            onRemoveOption={handleRemoveOption}
-            onOptionChange={handleOptionChange}
-            onDeleteQuestion={handleDeleteQuestion}
-          />
+          {quiz?.status === "draft" && (
+            <>
+              <div className="my-4">
+                <Typography type="p_16">
+                  All your changes would be auto saved
+                </Typography>
+              </div>
+              <EditQuestionAccordion
+                onSubmit={saveQuestion}
+                questions={questions}
+                expandedIndex={expandedItem}
+                onItemClick={handleAccordionClick}
+                onQuestionTitleChange={handleQuestionTitleChange}
+                onAddOption={handleAddOption}
+                onRemoveOption={handleRemoveOption}
+                onOptionChange={handleOptionChange}
+                onDeleteQuestion={handleDeleteQuestion}
+              />
 
-          <QuestionControls
-            publishQuiz={publishQuiz}
-            addNewQuestion={addNewQuestion}
-          />
+              <EditQuizControls
+                publishQuiz={publishQuiz}
+                addNewQuestion={addNewQuestion}
+              />
+            </>
+          )}
         </div>
       </div>
     </div>
