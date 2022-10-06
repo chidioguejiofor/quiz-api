@@ -1,6 +1,7 @@
 import { authAPI } from "domains/auth/apis";
 import { Router } from "express";
 import { QuizController } from "./controllers";
+import { QuestionController } from "./controllers/QuestionController";
 const router = Router();
 
 router.post("/quiz", authAPI.tokenMiddleware(), QuizController.createQuiz);
@@ -8,25 +9,25 @@ router.post("/quiz", authAPI.tokenMiddleware(), QuizController.createQuiz);
 router.get(
   "/user/quiz/:quizId/questions",
   authAPI.tokenMiddleware(),
-  QuizController.retrieveQuestions
+  QuestionController.retrieveQuestions
 );
 
 router.post(
   "/quiz/questions",
   authAPI.tokenMiddleware(),
-  QuizController.addQuestionToQuiz
+  QuestionController.addQuestionToQuiz
 );
 
 router.put(
   "/quiz/questions/:questionId",
   authAPI.tokenMiddleware(),
-  QuizController.updateQuestion
+  QuestionController.updateQuestion
 );
 
 router.delete(
   "/quiz/questions/:questionId",
   authAPI.tokenMiddleware(),
-  QuizController.deleteQuestion
+  QuestionController.deleteQuestion
 );
 
 router.get(
@@ -45,6 +46,12 @@ router.put(
   "/quiz/:quizId",
   authAPI.tokenMiddleware(),
   QuizController.updateQuiz
+);
+
+router.post(
+  "/quiz/:quizId/publish",
+  authAPI.tokenMiddleware(),
+  QuizController.publishQuiz
 );
 router.delete(
   "/quiz/:quizId",

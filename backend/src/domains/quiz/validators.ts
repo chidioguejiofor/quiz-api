@@ -10,6 +10,11 @@ export const updateQuizInputSchema = {
   authorId: "required|string",
 };
 
+export const publishQuizSchema = {
+  quizId: "string",
+  authorId: "required|string",
+};
+
 export const addQuestionInputValidatorSchema = {
   title: "required|string",
   imageURL: "string",

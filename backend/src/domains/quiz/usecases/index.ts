@@ -6,6 +6,7 @@ import { DeleteUserQuizUsecase } from "./DeleteUserQuizUsecase";
 import { GetQuestionUsecase } from "./GetQuestionUsecase";
 import { GetSingleQuizUsecase } from "./GetSingleQuizUsecase";
 import { GetUserQuizUsecase } from "./GetUserQuizUsecase";
+import { PublishQuizUsecase } from "./PublishQuizUsecase";
 import { UpdateQuestionUsecase } from "./UpdateQuestionUsecase";
 import { UpdateQuizUsecase } from "./UpdateQuizUsecase";
 
@@ -21,3 +22,4 @@ export const retrieveSingleQuizUsecase = new GetSingleQuizUsecase(
 );
 export const updateQuizUsecase = new UpdateQuizUsecase(QuizRepository);
 export const deleteQuizUsecase = new DeleteUserQuizUsecase(QuizRepository);
+export const publishQuizUsecase = new PublishQuizUsecase(QuizRepository);

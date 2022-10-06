@@ -1,3 +1,4 @@
+import randomstring from "randomstring";
 import { OptionEntity, QuestionEntity, QuizEntity } from "../entities";
 import { QuestionNotFound, QuizNotFound } from "../errors";
 import { Question } from "../models/question";
@@ -6,6 +7,25 @@ import { Quiz } from "../models/quiz";
 import { WhereOptions } from "sequelize";
 
 export class QuizRepository {
+  static async publishQuiz(quizId: string, authorId: string) {
+    const permalink = randomstring.generate({
+      length: 6,
+      charset: "alphanumeric",
+    });
+    const [, values] = await Quiz.update(
+      { status: "published", permalink },
+      {
+        where: {
+          id: quizId,
+          authorId,
+        },
+        returning: true,
+      }
+    );
+
+    return values[0];
+  }
+
   static deleteQuestion(questionId: string, quizId: string) {
     return Question.destroy({
       where: {
@@ -27,6 +47,7 @@ export class QuizRepository {
       where: {
         authorId,
         id: quizId,
+        status: "draft",
       },
       returning: true,
     });

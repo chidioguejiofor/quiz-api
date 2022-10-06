@@ -4,6 +4,7 @@ export interface QuizEntity extends BaseEntity {
   authorId: string;
   title: string;
   imageURL?: string;
+  permalink?: string;
   status: "published" | "draft";
 }
 

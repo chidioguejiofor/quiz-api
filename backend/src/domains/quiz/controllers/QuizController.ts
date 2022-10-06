@@ -4,166 +4,22 @@ import { AppLogger } from "shared/logger";
 import { AuthRequest } from "shared/types";
 import { handleUnknownError } from "shared/utils/errorHandlers";
 import {
-  CannotEditPublishedQuiz,
-  QuestionNotFound,
+  NotEnoughQuestionsInQuiz,
+  QuizAlreadyPublished,
   QuizNotFound,
 } from "../errors";
 import {
-  createQuestionUsecase,
   createQuizUsecase,
-  deleteQuestionUsecase,
   deleteQuizUsecase,
-  getQuestionUsecase,
+  publishQuizUsecase,
   retrieveQuizUsecase,
   retrieveSingleQuizUsecase,
-  updateQuestionUsecase,
   updateQuizUsecase,
 } from "../usecases";
 
 const logger = AppLogger.create("Quiz Controller");
 
 export class QuizController {
-  private static handleQuestionErrors(res: Response, error: unknown) {
-    if (error instanceof InvalidInputData) {
-      return res.status(400).json({
-        message: "Invalid inputs were specified",
-        errors: error.errors,
-      });
-    }
-
-    if (error instanceof CannotEditPublishedQuiz) {
-      return res.status(400).json({
-        message: "You cannot add questions to a published quiz",
-        errors: error.errors,
-      });
-    }
-
-    if (error instanceof QuizNotFound) {
-      return res.status(404).json({
-        message: "Quiz does not exist",
-        errors: error.errors,
-      });
-    }
-
-    if (error instanceof QuestionNotFound) {
-      return res.status(404).json({
-        message: "Question does not exist in specified quiz",
-        errors: error.errors,
-      });
-    }
-
-    return handleUnknownError(res, {
-      error,
-      logger,
-    });
-  }
-  public static async updateQuestion(req: AuthRequest, res: Response) {
-    const question = {
-      title: req.body.title,
-      imageURL: req.body.imageURL,
-      options: req.body.options,
-      quizId: req.body.quizId,
-    };
-    const questionId = req.params.questionId as string;
-    const userId = req.decoded?.userId as string;
-
-    try {
-      const data = await updateQuestionUsecase.execute(
-        userId,
-        question,
-        questionId
-      );
-
-      return res.status(201).json({
-        message: "Succesfully updated question",
-        data,
-      });
-    } catch (error) {
-      return QuizController.handleQuestionErrors(res, error);
-    }
-  }
-
-  public static async deleteQuestion(req: AuthRequest, res: Response) {
-    const questionId = req.params.questionId as string;
-    const userId = req.decoded?.userId as string;
-
-    try {
-      const data = await deleteQuestionUsecase.execute(
-        userId,
-        questionId,
-        req.body.quizId as string
-      );
-
-      return res.status(200).json({
-        message: "Succesfully deleted question",
-        data,
-      });
-    } catch (error) {
-      return QuizController.handleQuestionErrors(res, error);
-    }
-  }
-
-  public static async addQuestionToQuiz(req: AuthRequest, res: Response) {
-    const question = {
-      title: req.body.title,
-      imageURL: req.body.imageURL,
-      options: req.body.options,
-      quizId: req.body.quizId,
-    };
-    const userId = req.decoded?.userId as string;
-
-    try {
-      const data = await createQuestionUsecase.execute(userId, question);
-
-      return res.status(201).json({
-        message: "Succesfully added a question to the quiz",
-        data,
-      });
-    } catch (error) {
-      return QuizController.handleQuestionErrors(res, error);
-    }
-  }
-
-  public static async retrieveQuestions(req: AuthRequest, res: Response) {
-    const userId = req.decoded?.userId as string;
-    const quizId = req.params.quizId as string;
-
-    try {
-      const data = await getQuestionUsecase.execute(userId, quizId);
-
-      return res.status(200).json({
-        message: "Successfully retrieved questions for quiz",
-        data,
-      });
-    } catch (error) {
-      if (error instanceof InvalidInputData) {
-        return res.status(400).json({
-          message: "Invalid inputs were specified",
-          errors: error.errors,
-        });
-      }
-
-      if (error instanceof CannotEditPublishedQuiz) {
-        return res.status(400).json({
-          message: "You cannot add questions to a published quiz",
-          errors: error.errors,
-        });
-      }
-
-      if (error instanceof QuizNotFound) {
-        return res.status(404).json({
-          message: "Quiz does not exist",
-          errors: error.errors,
-        });
-      }
-
-      return handleUnknownError(res, {
-        error,
-        logger,
-      });
-    }
-  }
-
   public static async createQuiz(req: AuthRequest, res: Response) {
     const quiz = {
       title: req.body.title,
@@ -175,21 +31,27 @@ export class QuizController {
       const data = await createQuizUsecase.execute(userId, quiz);
 
       return res.status(201).json({
-        message: "Succesfully create quiz",
+        message: "Succesfully created quiz",
         data,
       });
     } catch (error) {
-      if (error instanceof InvalidInputData) {
-        return res.status(400).json({
-          message: "Invalid inputs were specified",
-          errors: error.errors,
-        });
-      }
+      return QuizController.handleErrors(error, res);
+    }
+  }
 
-      return handleUnknownError(res, {
-        error,
-        logger,
+  public static async publishQuiz(req: AuthRequest, res: Response) {
+    const userId = req.decoded?.userId as string;
+    const quizId = req.params?.quizId as string;
+
+    try {
+      const data = await publishQuizUsecase.execute(userId, quizId);
+
+      return res.status(201).json({
+        message: "Succesfully published quiz",
+        data,
       });
+    } catch (error) {
+      return QuizController.handleErrors(error, res);
     }
   }
 
@@ -206,17 +68,7 @@ export class QuizController {
         data,
       });
     } catch (error) {
-      if (error instanceof InvalidInputData) {
-        return res.status(400).json({
-          message: "Invalid inputs were specified",
-          errors: error.errors,
-        });
-      }
-
-      return handleUnknownError(res, {
-        error,
-        logger,
-      });
+      return QuizController.handleErrors(error, res);
     }
   }
 
@@ -234,17 +86,7 @@ export class QuizController {
         data,
       });
     } catch (error) {
-      if (error instanceof InvalidInputData) {
-        return res.status(400).json({
-          message: "Invalid inputs were specified",
-          errors: error.errors,
-        });
-      }
-
-      return handleUnknownError(res, {
-        error,
-        logger,
-      });
+      return QuizController.handleErrors(error, res);
     }
   }
 
@@ -266,29 +108,12 @@ export class QuizController {
         data,
       });
     } catch (error) {
-      if (error instanceof InvalidInputData) {
-        return res.status(400).json({
-          message: "Invalid inputs were specified",
-          errors: error.errors,
-        });
-      }
-
-      if (error instanceof QuizNotFound) {
-        return res.status(404).json({
-          message: "Quiz you specified was not found",
-          errors: error.errors,
-        });
-      }
-
-      return handleUnknownError(res, {
-        error,
-        logger,
-      });
+      return QuizController.handleErrors(error, res);
     }
   }
 
   public static async deleteQuiz(req: AuthRequest, res: Response) {
-    logger.info("hello from quiz");
+    logger.info("Deleting quiz...");
     try {
       const userId = req.decoded?.userId as string;
       const quizId = req.params.quizId as string;
@@ -300,24 +125,40 @@ export class QuizController {
         data,
       });
     } catch (error) {
-      if (error instanceof InvalidInputData) {
-        return res.status(400).json({
-          message: "Invalid inputs were specified",
-          errors: error.errors,
-        });
-      }
-
-      if (error instanceof QuizNotFound) {
-        return res.status(404).json({
-          message: "Quiz was not found",
-          errors: error.errors,
-        });
-      }
-
-      return handleUnknownError(res, {
-        error,
-        logger,
+      return QuizController.handleErrors(error, res);
+    }
+  }
+  private static handleErrors(error: unknown, res: Response) {
+    if (error instanceof InvalidInputData) {
+      return res.status(400).json({
+        message: "Invalid inputs were specified",
+        errors: error.errors,
       });
     }
+
+    if (error instanceof QuizNotFound) {
+      return res.status(404).json({
+        message: "Quiz you specified was not found",
+        errors: error.errors,
+      });
+    }
+
+    if (error instanceof QuizAlreadyPublished) {
+      return res.status(409).json({
+        message: "You cannot publish an already published quiz. Only delete",
+        errors: error.errors,
+      });
+    }
+
+    if (error instanceof NotEnoughQuestionsInQuiz) {
+      return res.status(400).json({
+        message: "You need at least 2 questions in order to publish a quiz",
+        errors: error.errors,
+      });
+    }
+    return handleUnknownError(res, {
+      error,
+      logger,
+    });
   }
 }
