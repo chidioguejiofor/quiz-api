@@ -1,6 +1,7 @@
 import React, { SyntheticEvent } from "react";
-import { AccordionItem } from "./Accordion";
+import { Accordion, AccordionItem } from "./Accordion";
 import AddOptionsForm from "./AddOptionsForm";
+import EditDeleteControls from "./EditDeleteControls";
 
 type EditQuestionItemProps = {
   questions: any[];
@@ -11,8 +12,9 @@ type EditQuestionItemProps = {
   onAddOption: (qIndex: number) => () => void;
   onRemoveOption: (qIndex: number) => (index: number) => void;
   onSubmit: (e: SyntheticEvent, qIndex: number) => void;
+  onDeleteQuestion: (qIndex: number) => () => void;
 };
-export function EditQuestionItems(props: EditQuestionItemProps) {
+export function EditQuestionAccordion(props: EditQuestionItemProps) {
   const {
     questions,
     expandedIndex,
@@ -21,11 +23,12 @@ export function EditQuestionItems(props: EditQuestionItemProps) {
     onAddOption,
     onRemoveOption,
     onOptionChange,
+    onDeleteQuestion,
     onSubmit,
   } = props;
 
   return (
-    <>
+    <Accordion id="questions">
       {questions.map((question, qIndex) => {
         const label = question.id
           ? question.title
@@ -38,6 +41,12 @@ export function EditQuestionItems(props: EditQuestionItemProps) {
             id={question.id}
             expanded={expandedIndex === qIndex}
             onClick={onItemClick(qIndex)}
+            controls={
+              <EditDeleteControls
+                onDelete={onDeleteQuestion(qIndex)}
+                onEdit={onItemClick(qIndex)}
+              />
+            }
           >
             <AddOptionsForm
               onSubmit={(e) => onSubmit(e, qIndex)}
@@ -47,10 +56,11 @@ export function EditQuestionItems(props: EditQuestionItemProps) {
               onAddOption={onAddOption(qIndex)}
               onRemoveOption={onRemoveOption(qIndex)}
               onOptionChange={onOptionChange(qIndex)}
+              onDeleteQuestion={onDeleteQuestion(qIndex)}
             />
           </AccordionItem>
         );
       })}
-    </>
+    </Accordion>
   );
 }

@@ -1,15 +1,17 @@
+import Image from "next/image";
 import React, { ReactNode } from "react";
 
 type AccordionItemProps = {
   label: string;
   children: ReactNode;
+  controls?: ReactNode;
   expanded?: boolean;
   id: string;
   parentId: string;
   onClick: () => void;
 };
 export function AccordionItem(props: AccordionItemProps) {
-  const { label, children, expanded, id, parentId, onClick } = props;
+  const { label, children, expanded, id, parentId, onClick, controls } = props;
   return (
     <div className="accordion-item bg-white border border-gray-200">
       <h2 className="accordion-header mb-0">
@@ -39,6 +41,7 @@ export function AccordionItem(props: AccordionItemProps) {
         >
           {label}
         </button>
+        {controls}
       </h2>
       <div
         id={id}

@@ -12,7 +12,7 @@ module.exports = {
         h3: ["2rem", "3rem"],
         btn_32: ["2rem", "2rem"],
         btn_18: ["1.25rem", "1.25rem"],
-        btn_14: ["0.875rem", "1rem"],
+        btn_14: ["0.875rem", "0.875rem"], // "14px", "14px"
         p_18: ["1.25rem", "2rem"],
         p_16: ["1rem", "1.15rem"],
       },

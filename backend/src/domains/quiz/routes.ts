@@ -17,10 +17,28 @@ router.post(
   QuizController.addQuestionToQuiz
 );
 
+router.put(
+  "/quiz/questions/:questionId",
+  authAPI.tokenMiddleware(),
+  QuizController.updateQuestion
+);
+
+router.delete(
+  "/quiz/questions/:questionId",
+  authAPI.tokenMiddleware(),
+  QuizController.deleteQuestion
+);
+
 router.get(
   "/user/quiz",
   authAPI.tokenMiddleware(),
   QuizController.retrieveQuiz
+);
+
+router.get(
+  "/quiz/:quizId",
+  authAPI.tokenMiddleware(),
+  QuizController.getSingleQuiz
 );
 router.delete(
   "/quiz/:quizId",

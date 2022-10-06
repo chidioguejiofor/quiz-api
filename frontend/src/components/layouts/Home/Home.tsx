@@ -4,21 +4,24 @@ import { Quiz } from "core/api/Quiz";
 import { useMakeAPICall } from "core/api/useResource";
 import { BackendResponse, QuizData } from "core/models/quiz";
 import { useUser } from "hooks/useUser";
+import { useRouter } from "next/router";
 import React, { SyntheticEvent, useState } from "react";
 import { formDataToJSON } from "utils/formHelpers";
 import CardSection from "./CardSection";
 import QuizForm from "./QuizForm";
 
 export function HomePage() {
+  const router = useRouter();
   const [user] = useUser();
   const token = user?.token;
 
   const [show, setShow] = useState(false);
   const { json: quizesRes, refetch } = useMakeAPICall<
-    BackendResponse<QuizData>
-  >(token ? "/user/quiz" : null, {
+    BackendResponse<QuizData[]>
+  >(router.isReady ? "/user/quiz" : null, {
     token,
   });
+
   const toggleShow = () => setShow(!show);
 
   const quizes = quizesRes?.data;

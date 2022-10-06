@@ -15,6 +15,7 @@ type AddOptionsFormProps = {
   onOptionChange: (newOption: Option, index: number) => void;
   onAddOption: () => void;
   onRemoveOption: (index: number) => void;
+  onDeleteQuestion: () => void;
 };
 const AddOptionsForm = (props: AddOptionsFormProps) => {
   const {
@@ -25,6 +26,7 @@ const AddOptionsForm = (props: AddOptionsFormProps) => {
     onOptionChange,
     onQuestionTitleChange,
     onSubmit,
+    onDeleteQuestion,
   } = props;
 
   const handleOptionChange =
@@ -87,7 +89,7 @@ const AddOptionsForm = (props: AddOptionsFormProps) => {
                 <Button
                   onClick={() => onRemoveOption(index)}
                   htmlType="button"
-                  outlined
+                  type="outlined"
                   size="small"
                 >
                   Remove Item
@@ -105,13 +107,24 @@ const AddOptionsForm = (props: AddOptionsFormProps) => {
                   <Button
                     onClick={onAddOption}
                     htmlType="button"
-                    outlined
+                    type="outlined"
                     size="small"
                   >
                     Add Option
                   </Button>
                 </div>
-                <Button size="small">Save Question</Button>
+                <div className="mr-4">
+                  <Button size="small">Save Question</Button>
+                </div>
+
+                <Button
+                  onClick={onDeleteQuestion}
+                  htmlType="button"
+                  type="cta"
+                  size="small"
+                >
+                  Delete Question
+                </Button>
               </div>
             </td>
           </tr>

@@ -3,18 +3,105 @@ import { InvalidInputData } from "shared/errors";
 import { AppLogger } from "shared/logger";
 import { AuthRequest } from "shared/types";
 import { handleUnknownError } from "shared/utils/errorHandlers";
-import { CannotEditPublishedQuiz, QuizNotFound } from "../errors";
+import {
+  CannotEditPublishedQuiz,
+  QuestionNotFound,
+  QuizNotFound,
+} from "../errors";
 import {
   createQuestionUsecase,
   createQuizUsecase,
+  deleteQuestionUsecase,
   deleteQuizUsecase,
   getQuestionUsecase,
   retrieveQuizUsecase,
-} from "../usecases/index";
+  retrieveSingleQuizUsecase,
+  updateQuestionUsecase,
+} from "../usecases";
 
 const logger = AppLogger.create("Quiz Controller");
 
 export class QuizController {
+  private static handleQuestionErrors(res: Response, error: unknown) {
+    if (error instanceof InvalidInputData) {
+      return res.status(400).json({
+        message: "Invalid inputs were specified",
+        errors: error.errors,
+      });
+    }
+
+    if (error instanceof CannotEditPublishedQuiz) {
+      return res.status(400).json({
+        message: "You cannot add questions to a published quiz",
+        errors: error.errors,
+      });
+    }
+
+    if (error instanceof QuizNotFound) {
+      return res.status(404).json({
+        message: "Quiz does not exist",
+        errors: error.errors,
+      });
+    }
+
+    if (error instanceof QuestionNotFound) {
+      return res.status(404).json({
+        message: "Question does not exist in specified quiz",
+        errors: error.errors,
+      });
+    }
+
+    return handleUnknownError(res, {
+      error,
+      logger,
+    });
+  }
+  public static async updateQuestion(req: AuthRequest, res: Response) {
+    const question = {
+      title: req.body.title,
+      imageURL: req.body.imageURL,
+      options: req.body.options,
+      quizId: req.body.quizId,
+    };
+    const questionId = req.params.questionId as string;
+    const userId = req.decoded?.userId as string;
+
+    try {
+      const data = await updateQuestionUsecase.execute(
+        userId,
+        question,
+        questionId
+      );
+
+      return res.status(201).json({
+        message: "Succesfully updated question",
+        data,
+      });
+    } catch (error) {
+      return QuizController.handleQuestionErrors(res, error);
+    }
+  }
+
+  public static async deleteQuestion(req: AuthRequest, res: Response) {
+    const questionId = req.params.questionId as string;
+    const userId = req.decoded?.userId as string;
+
+    try {
+      const data = await deleteQuestionUsecase.execute(
+        userId,
+        questionId,
+        req.body.quizId as string
+      );
+
+      return res.status(200).json({
+        message: "Succesfully deleted question",
+        data,
+      });
+    } catch (error) {
+      return QuizController.handleQuestionErrors(res, error);
+    }
+  }
+
   public static async addQuestionToQuiz(req: AuthRequest, res: Response) {
     const question = {
       title: req.body.title,
@@ -28,35 +115,11 @@ export class QuizController {
       const data = await createQuestionUsecase.execute(userId, question);
 
       return res.status(201).json({
-        message: "Succesfully created quiz",
+        message: "Succesfully added a question to the quiz",
         data,
       });
     } catch (error) {
-      if (error instanceof InvalidInputData) {
-        return res.status(400).json({
-          message: "Invalid inputs were specified",
-          errors: error.errors,
-        });
-      }
-
-      if (error instanceof CannotEditPublishedQuiz) {
-        return res.status(400).json({
-          message: "You cannot add questions to a published quiz",
-          errors: error.errors,
-        });
-      }
-
-      if (error instanceof QuizNotFound) {
-        return res.status(404).json({
-          message: "Quiz does not exist",
-          errors: error.errors,
-        });
-      }
-
-      return handleUnknownError(res, {
-        error,
-        logger,
-      });
+      return QuizController.handleQuestionErrors(res, error);
     }
   }
 
@@ -128,6 +191,7 @@ export class QuizController {
       });
     }
   }
+
   public static async retrieveQuiz(req: AuthRequest, res: Response) {
     logger.info("Retrieving Quiz...");
 
@@ -138,6 +202,34 @@ export class QuizController {
 
       return res.status(200).json({
         message: "Succesfully retrieved user quiz",
+        data,
+      });
+    } catch (error) {
+      if (error instanceof InvalidInputData) {
+        return res.status(400).json({
+          message: "Invalid inputs were specified",
+          errors: error.errors,
+        });
+      }
+
+      return handleUnknownError(res, {
+        error,
+        logger,
+      });
+    }
+  }
+
+  public static async getSingleQuiz(req: AuthRequest, res: Response) {
+    const quizId = req.params.quizId;
+    const userId = req.decoded?.userId as string;
+
+    logger.info("Retrieving single Quiz...", { quizId, userId });
+
+    try {
+      const data = await retrieveSingleQuizUsecase.execute(userId, quizId);
+
+      return res.status(200).json({
+        message: "Succesfully retrieved quiz",
         data,
       });
     } catch (error) {
