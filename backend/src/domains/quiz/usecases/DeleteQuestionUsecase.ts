@@ -1,7 +1,11 @@
 import { AppLogger } from "shared/logger";
 import { validateSchema } from "shared/utils/validation";
 
-import { QuestionNotFound, QuizNotFound } from "../errors";
+import {
+  CannotEditPublishedQuiz,
+  QuestionNotFound,
+  QuizNotFound,
+} from "../errors";
 import { QuizRepositoryType } from "../repositories/index";
 import { deleteQuestionInputSchema } from "../validators";
 
@@ -35,6 +39,7 @@ export class DeleteQuestionUsecase {
 
     const quiz = await this.quizRepository.getQuiz(authorId, quizId);
     if (!quiz) throw new QuizNotFound();
+    if (quiz.status !== "draft") throw new CannotEditPublishedQuiz();
 
     logger.info("Quiz is valid");
   }

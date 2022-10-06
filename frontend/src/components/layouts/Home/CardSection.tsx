@@ -4,10 +4,11 @@ import React from "react";
 
 type CardSectionProps = {
   quizes?: QuizData[];
+  currentUserId?: string;
   onDelete: (quizId: string) => void;
 };
 function CardSection(props: CardSectionProps) {
-  const { quizes, onDelete } = props;
+  const { quizes, onDelete, currentUserId } = props;
 
   return (
     <>
@@ -18,7 +19,11 @@ function CardSection(props: CardSectionProps) {
               key={quiz.id}
               quizId={quiz.id}
               title={quiz.title}
+              currentUserId={currentUserId}
               onDelete={() => onDelete(quiz.id)}
+              status={quiz.status}
+              authorId={quiz.authorId}
+              permalink={quiz.permalink}
             />
           ))}
         </div>

@@ -9,9 +9,10 @@ type QuizControlsProps = {
   title: string;
   onUpdateQuiz: (e: FormEvent<HTMLFormElement>) => void;
   deleteQuiz: () => void;
+  showControls: boolean;
 };
 function QuizControls(props: QuizControlsProps) {
-  const { onUpdateQuiz, title, deleteQuiz } = props;
+  const { onUpdateQuiz, title, deleteQuiz, showControls } = props;
   const [formTitle, setFormTitle] = useState("");
   const [showForm, setShowForm] = useState(false);
   const toggleForm = () => {
@@ -29,10 +30,12 @@ function QuizControls(props: QuizControlsProps) {
     toggleForm();
   };
 
+  const spacingSytle = showControls ? "justify-between" : "";
+
   return (
     <div className="h-20">
       {!showForm && (
-        <div className="mb-8 flex items-center justify-between">
+        <div className={`mb-8 flex items-center ${spacingSytle}`}>
           <Button htmlType="button" href={pages.home} size="small">
             <Image
               alt="Back"
@@ -43,9 +46,13 @@ function QuizControls(props: QuizControlsProps) {
             />
           </Button>
 
-          <Typography type="h3">{title}</Typography>
+          <div className="ml-4">
+            <Typography type="h3">{title}</Typography>
+          </div>
 
-          <EditDeleteControls onDelete={deleteQuiz} onEdit={toggleForm} />
+          {showControls && (
+            <EditDeleteControls onDelete={deleteQuiz} onEdit={toggleForm} />
+          )}
         </div>
       )}
 

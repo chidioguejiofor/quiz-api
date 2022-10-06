@@ -5,7 +5,7 @@ type QuestionControlsProps = {
   publishQuiz: () => void;
   addNewQuestion: () => void;
 };
-function QuestionControls(props: QuestionControlsProps) {
+function EditQuizControls(props: QuestionControlsProps) {
   const { publishQuiz, addNewQuestion } = props;
   return (
     <div className="mt-5 flex">
@@ -27,4 +27,4 @@ function QuestionControls(props: QuestionControlsProps) {
   );
 }
 
-export default QuestionControls;
+export default EditQuizControls;
