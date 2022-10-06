@@ -1,22 +1,35 @@
 import { OptionEntity, QuestionEntity, QuizEntity } from "../entities";
-import { QuizNotFound } from "../errors";
+import { QuestionNotFound, QuizNotFound } from "../errors";
 import { Question } from "../models/question";
 import { Option } from "../models/option";
 import { Quiz } from "../models/quiz";
 import { WhereOptions } from "sequelize";
 
 export class QuizRepository {
+  static deleteQuestion(questionId: string, quizId: string) {
+    return Question.destroy({
+      where: {
+        id: questionId,
+        quizId,
+      },
+    });
+  }
   public static async createQuiz(input: QuizEntity): Promise<QuizEntity> {
     return Quiz.create(input);
   }
 
-  public static async fetchAllAuthorQuiz(
-    authorId: string
+  public static async fetchAuthorQuiz(
+    authorId: string,
+    quizId?: string | string[]
   ): Promise<QuizEntity[]> {
+    const where: WhereOptions = {
+      authorId,
+    };
+    if (quizId) {
+      where["id"] = quizId;
+    }
     return Quiz.findAll({
-      where: {
-        authorId,
-      },
+      where,
     });
   }
 
@@ -76,6 +89,22 @@ export class QuizRepository {
 
   public static async addQuestionOptions(options: OptionEntity[]) {
     return Option.bulkCreate(options);
+  }
+
+  public static async clearQuestionOptions(questionId: string) {
+    return Option.destroy({ where: { questionId } });
+  }
+
+  public static async updateQuestion(
+    questionObject: QuestionEntity,
+    quizId: string,
+    questionId: string
+  ) {
+    const [updated] = await Question.update(questionObject, {
+      where: { id: questionId, quizId },
+    });
+
+    if (!updated) throw new QuestionNotFound();
   }
 }
 

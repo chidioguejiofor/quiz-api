@@ -1,6 +1,7 @@
 import { AppLogger } from "shared/logger";
 import { validateSchema } from "shared/utils/validation";
-import { v4 } from "uuid";
+import { QuestionEntity } from "../entities";
+
 import {
   CannotEditPublishedQuiz,
   QuestionMustHaveAtLeastOneAnswer,
@@ -8,42 +9,63 @@ import {
 } from "../errors";
 import { QuizRepositoryType } from "../repositories/index";
 import { QuestionInput } from "../types";
-import { addQuestionInputValidatorSchema } from "../validators";
+import { updateQuestionInputSchema } from "../validators";
 
-const logger = AppLogger.create("CreateQuestionUsecase");
+const logger = AppLogger.create("UpdateQuestionUsecase");
 
-export class CreateQuestionUsecase {
+export class UpdateQuestionUsecase {
   constructor(private quizRepository: QuizRepositoryType) {}
 
-  async execute(authorId: string, input: Partial<QuestionInput>) {
-    logger.info("Adding a question to a quiz...");
+  async execute(
+    authorId: string,
+    input: Partial<QuestionInput>,
+    questionId: string
+  ) {
+    logger.info("Updating a question...");
+    const quizId = input.quizId as string;
+    validateSchema({ ...input, questionId }, updateQuestionInputSchema);
+    this.validateQuiz(authorId, quizId);
 
-    validateSchema(input, addQuestionInputValidatorSchema);
-    this.validateQuiz(authorId, input.quizId as string);
-
-    const question = await this.createQuestion(input as QuestionInput);
-    logger.info("Successfully created Question");
+    const question = await this.updateQuestion(
+      quizId,
+      questionId,
+      input as QuestionInput
+    );
+    logger.info("Successfully updated Question");
 
     return question;
   }
+
   private async validateQuiz(authorId: string, quizId: string) {
+    logger.info("Validating quizId..");
+
     const quiz = await this.quizRepository.getQuiz(authorId, quizId);
     if (!quiz) throw new QuizNotFound();
     if (quiz.status !== "draft") {
       throw new CannotEditPublishedQuiz();
     }
+
+    logger.info("Quiz is valid");
   }
 
-  private async createQuestion(input: QuestionInput) {
-    const { numberOfAnswers, questionId, options } = this.buildOptions(input);
+  private async updateQuestion(
+    quizId: string,
+    questionId: string,
+    input: QuestionInput
+  ) {
+    const { numberOfAnswers, options } = this.buildOptions(questionId, input);
 
-    await this.quizRepository.createQuestion({
-      id: questionId,
+    const questionObject = {
       title: input.title,
       imageURL: input.imageURL,
-      quizId: input.quizId,
       numberOfAnswers,
-    });
+    };
+    await this.quizRepository.updateQuestion(
+      questionObject as QuestionEntity,
+      quizId,
+      questionId
+    );
+    await this.quizRepository.clearQuestionOptions(questionId);
     await this.quizRepository.addQuestionOptions(options);
     const newQuestions = await this.quizRepository.fetchQuestions(
       input.quizId as string,
@@ -52,9 +74,8 @@ export class CreateQuestionUsecase {
     return newQuestions[0];
   }
 
-  private buildOptions(input: QuestionInput) {
+  private buildOptions(questionId: string, input: QuestionInput) {
     let numberOfAnswers = 0;
-    const questionId = v4();
     const options = input.options.map((option) => {
       numberOfAnswers += +option.isAnswer;
       return {

@@ -4,7 +4,6 @@ import { Credentials } from "core/api/types";
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { pages } from "constants/pages";
-import { signOut } from "next-auth/react";
 
 export default NextAuth({
   pages: {
@@ -19,19 +18,20 @@ export default NextAuth({
           accessToken: user.accessToken as string,
           refreshToken: user.refreshToken as string,
           accessTokenExpires: user.accessTokenExpires as number,
+          valid: true,
         };
       } else {
-        if (token.accessTokenExpires <= +new Date()) {
-          signOut();
+        if (token.accessTokenExpires < Date.now()) {
+          return { ...token, valid: false };
         }
-
         return token;
       }
     },
-    async session({ session, token }) {
+    async session({ session, token }: any) {
       return {
         ...session,
         user: token,
+        valid: token.valid,
       };
     },
   },

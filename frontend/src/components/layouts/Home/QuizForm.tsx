@@ -1,4 +1,4 @@
-import { Button } from "components/Button";
+import { Button, ButtonProps } from "components/Button";
 import React, { SyntheticEvent } from "react";
 import { FormInput } from "../auth/FormInput";
 
@@ -9,11 +9,22 @@ type QuizFormProps = {
 };
 function QuizForm(props: QuizFormProps) {
   const { show, toggleShow, onSubmit } = props;
-  const text = show ? "Hide Form" : "Show Quiz form";
+  let text = "Show Quiz form";
+
+  let btnType = "skyblue";
+
+  if (show) {
+    text = "Hide Form";
+    btnType = "outlined";
+  }
   return (
     <div className="mb-4">
       <div>
-        <Button onClick={toggleShow} size="small" outlined={show}>
+        <Button
+          onClick={toggleShow}
+          size="small"
+          type={btnType as ButtonProps["type"]}
+        >
           {text}
         </Button>
         {show && (

@@ -2,6 +2,7 @@ import { SessionProvider } from "next-auth/react";
 import "../styles/globals.css";
 
 import type { AppProps } from "next/app";
+import { SessionValidator } from "../components/SessionValidator/SessionValidator";
 
 function MyApp({
   Component,
@@ -9,7 +10,9 @@ function MyApp({
 }: AppProps<any>) {
   return (
     <SessionProvider session={session}>
-      <Component {...pageProps} />
+      <SessionValidator>
+        <Component {...pageProps} />
+      </SessionValidator>
     </SessionProvider>
   );
 }

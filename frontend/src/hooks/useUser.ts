@@ -10,7 +10,7 @@ export const useUser = (): [User | null, string] => {
   const { data, status } = useSession();
 
   let user = null;
-  if (data?.user) {
+  if (status === "authenticated" && data?.user) {
     const json = data.user as any;
     const userData = json.data;
     user = {

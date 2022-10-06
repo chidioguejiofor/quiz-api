@@ -10,12 +10,10 @@ export function useMakeAPICall<T>(
     error,
     mutate,
   } = useSWR<T>({ endpoint, args }, fetcher, {
-    revalidateOnMount: false,
     revalidateOnFocus: false,
   });
 
   const refetch = async () => {
-    // const data = await fetcher({ endpoint, args });
     mutate();
   };
 

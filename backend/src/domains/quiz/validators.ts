@@ -10,3 +10,13 @@ export const addQuestionInputValidatorSchema = {
   quizId: "required|string",
   options: "required|array|min:2|max:6",
 };
+
+export const updateQuestionInputSchema = {
+  ...addQuestionInputValidatorSchema,
+  questionId: "required|string",
+};
+
+export const deleteQuestionInputSchema = {
+  questionId: "required|string",
+  quizId: "required|string",
+};

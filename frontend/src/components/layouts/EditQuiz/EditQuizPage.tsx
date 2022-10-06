@@ -1,15 +1,22 @@
-import { Button } from "components/Button";
 import { Header } from "components/Header";
 import { Typography } from "components/Typography";
 import { Quiz } from "core/api/Quiz";
 import { useMakeAPICall } from "core/api/useResource";
-import { BackendResponse, QuestionData, QuestionInput } from "core/models/quiz";
+import {
+  BackendResponse,
+  QuestionData,
+  QuestionInput,
+  QuizData,
+} from "core/models/quiz";
 import { useUser } from "hooks/useUser";
 import { useRouter } from "next/router";
-import React, { SyntheticEvent, useEffect, useState } from "react";
+import React, { FormEvent, SyntheticEvent, useEffect, useState } from "react";
 
-import { Accordion } from "./Accordion";
-import { EditQuestionItems } from "./EditQuestionItems";
+import { EditQuestionAccordion } from "./EditQuestionAccordion";
+import EditDeleteControls from "./EditDeleteControls";
+import QuestionControls from "./QuestionControls";
+import QuizControls from "./QuizControls";
+import { pages } from "constants/pages";
 
 type Option = {
   text: string;
@@ -17,21 +24,31 @@ type Option = {
   id?: string;
 };
 
+type Question = QuestionInput | QuestionData;
+
 export function EditQuizPage() {
   const [user] = useUser();
   const [expandedItem, setExpandedItem] = useState(-1);
   const router = useRouter();
   const quizId = router.query.quizId as string;
-  const { json } = useMakeAPICall<BackendResponse<QuestionData>>(
+  const token = user?.token as string;
+  const { json } = useMakeAPICall<BackendResponse<QuestionData[]>>(
     router.isReady ? `/user/quiz/${quizId}/questions` : null,
     {
-      token: user?.token,
+      token: token,
     }
   );
 
-  const [questions, setQuestions] = useState<(QuestionInput | QuestionData)[]>(
-    []
+  const { json: quizJson } = useMakeAPICall<BackendResponse<QuizData>>(
+    router.isReady ? `/quiz/${quizId}` : null,
+    {
+      token: token,
+    }
   );
+
+  console.log("quizJson==>", quizJson);
+
+  const [questions, setQuestions] = useState<Question[]>([]);
   useEffect(() => {
     const unsavedQuestions = questions.filter(
       (question) => !("id" in question)
@@ -44,7 +61,10 @@ export function EditQuizPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [json]);
 
-  const handleAccordionClick = (itemIndex: number) => () => {
+  const handleAccordionClick = (itemIndex: number) => async () => {
+    if (expandedItem !== -1) {
+      await persistQuestion(expandedItem, false);
+    }
     if (itemIndex === expandedItem) {
       setExpandedItem(-1);
     } else {
@@ -57,6 +77,17 @@ export function EditQuizPage() {
       questions[questionIndex].title = value;
       setQuestions([...questions]);
     };
+
+  const handleDeleteQuestion = (questionIndex: number) => async () => {
+    const question = questions[questionIndex];
+    if ("id" in question) {
+      await Quiz.deleteQuestion(question, token as string);
+    }
+
+    questions.splice(questionIndex, 1);
+    setQuestions([...questions]);
+    setExpandedItem(-1);
+  };
   const handleAddOption = (questionIndex: number) => () => {
     const question = questions[questionIndex];
 
@@ -120,23 +151,24 @@ export function EditQuizPage() {
     }
   };
 
-  const saveQuestion = async (e: SyntheticEvent, qIndex: number) => {
-    e.preventDefault();
-
+  async function persistQuestion(qIndex: number, showError = true) {
     const question = questions[qIndex];
+
     const hasAtLeastOneAnswer = question.options.some(
       (option) => option.isAnswer
     );
     if (!hasAtLeastOneAnswer) {
-      alert("Must contain at least one answer");
+      if (showError) alert("Must contain at least one answer");
       return;
     }
 
     try {
-      const newQuestion = await Quiz.createQuestion(
-        question as QuestionInput,
-        user?.token as string
-      );
+      let newQuestion;
+      if ("id" in question) {
+        newQuestion = await Quiz.updateQuestion(question, token as string);
+      } else {
+        newQuestion = await Quiz.createQuestion(question, token as string);
+      }
 
       questions[qIndex] = newQuestion.data;
       setQuestions([...questions]);
@@ -144,45 +176,50 @@ export function EditQuizPage() {
     } catch (error) {
       alert("error occured");
     }
+  }
+
+  const saveQuestion = async (e: SyntheticEvent, qIndex: number) => {
+    e.preventDefault();
+    await persistQuestion(qIndex);
   };
+
+  const handleUpdateQuiz = async (e: FormEvent) => {
+    const formData = new FormData(e.target as HTMLFormElement);
+    const title = formData.get("title") as string;
+  };
+
+  const handleDeleteQuiz = async () => {
+    await Quiz.deleteQuiz(quizId, token);
+    router.push(pages.home);
+  };
+
   return (
     <div>
       <Header />
 
-      <div className=" flex justify-center overflow-y-scroll">
+      <div className=" flex justify-center overflow-y-scroll mt-4">
         <div className="w-full max-w-[1200px]">
-          <div className="mb-8">
-            <Typography type="h3">Editing Quiz</Typography>
-          </div>
+          <QuizControls
+            onUpdateQuiz={handleUpdateQuiz}
+            title={quizJson?.data.title || ""}
+            deleteQuiz={handleDeleteQuiz}
+          />
+          <EditQuestionAccordion
+            onSubmit={saveQuestion}
+            questions={questions}
+            expandedIndex={expandedItem}
+            onItemClick={handleAccordionClick}
+            onQuestionTitleChange={handleQuestionTitleChange}
+            onAddOption={handleAddOption}
+            onRemoveOption={handleRemoveOption}
+            onOptionChange={handleOptionChange}
+            onDeleteQuestion={handleDeleteQuestion}
+          />
 
-          <Accordion id="questions">
-            <EditQuestionItems
-              onSubmit={saveQuestion}
-              questions={questions}
-              expandedIndex={expandedItem}
-              onItemClick={handleAccordionClick}
-              onQuestionTitleChange={handleQuestionTitleChange}
-              onAddOption={handleAddOption}
-              onRemoveOption={handleRemoveOption}
-              onOptionChange={handleOptionChange}
-            />
-          </Accordion>
-          <div className="mt-5 flex">
-            <Button htmlType="button" size="small" onClick={publishQuiz}>
-              Publish Question
-            </Button>
-
-            <div className="ml-4">
-              <Button
-                htmlType="button"
-                size="small"
-                outlined
-                onClick={addNewQuestion}
-              >
-                Add Question
-              </Button>
-            </div>
-          </div>
+          <QuestionControls
+            publishQuiz={publishQuiz}
+            addNewQuestion={addNewQuestion}
+          />
         </div>
       </div>
     </div>

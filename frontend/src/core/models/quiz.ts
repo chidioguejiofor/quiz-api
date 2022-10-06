@@ -10,7 +10,7 @@ export type QuizData = {
 
 export type BackendResponse<T> = {
   message: string;
-  data: T[];
+  data: T;
 };
 
 type Option = {
@@ -33,6 +33,7 @@ export type QuestionData = {
 export type QuestionInput = {
   quizId: string;
   title: string;
-  imageURL?: string;
+  imageURL?: string | null;
+
   options: Option[];
 };

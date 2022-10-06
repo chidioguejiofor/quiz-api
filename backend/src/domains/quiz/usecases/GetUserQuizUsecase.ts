@@ -4,6 +4,6 @@ export class GetUserQuizUsecase {
   constructor(private quizRepository: QuizRepositoryType) {}
 
   async execute(authorId: string) {
-    return this.quizRepository.fetchAllAuthorQuiz(authorId);
+    return this.quizRepository.fetchAuthorQuiz(authorId);
   }
 }
