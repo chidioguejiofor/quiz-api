@@ -12,7 +12,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     return {
       redirect: {
         permanent: false,
-        destination: pages.login,
+        destination: `${pages.login}?next=/home`,
       },
     };
   }

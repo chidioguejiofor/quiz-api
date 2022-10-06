@@ -8,13 +8,13 @@ import { useRouter } from "next/router";
 
 export function Signup() {
   const router = useRouter();
-  
+
   const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
     const signupInput: any = {};
     formData.forEach((value, key) => (signupInput[key] = value));
-    const data = await Auth.signup(signupInput);
+    const { data } = await Auth.signup(signupInput);
     if (data) {
       router.push(pages.login);
     }

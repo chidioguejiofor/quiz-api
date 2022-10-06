@@ -1,5 +1,6 @@
 import { Header } from "components/Header";
-import { Typography } from "components/Typography";
+import { toast } from "react-toastify";
+
 import { Quiz } from "core/api/Quiz";
 import { useMakeAPICall } from "core/api/useResource";
 import {
@@ -13,10 +14,10 @@ import { useRouter } from "next/router";
 import React, { FormEvent, SyntheticEvent, useEffect, useState } from "react";
 
 import { EditQuestionAccordion } from "./EditQuestionAccordion";
-import EditDeleteControls from "./EditDeleteControls";
 import QuestionControls from "./QuestionControls";
 import QuizControls from "./QuizControls";
 import { pages } from "constants/pages";
+import { Typography } from "components/Typography";
 
 type Option = {
   text: string;
@@ -39,14 +40,11 @@ export function EditQuizPage() {
     }
   );
 
-  const { json: quizJson } = useMakeAPICall<BackendResponse<QuizData>>(
-    router.isReady ? `/quiz/${quizId}` : null,
-    {
-      token: token,
-    }
-  );
-
-  console.log("quizJson==>", quizJson);
+  const { json: quizJson, refetch: refetchQuiz } = useMakeAPICall<
+    BackendResponse<QuizData>
+  >(router.isReady ? `/quiz/${quizId}` : null, {
+    token: token,
+  });
 
   const [questions, setQuestions] = useState<Question[]>([]);
   useEffect(() => {
@@ -57,7 +55,6 @@ export function EditQuizPage() {
     if (json?.data) {
       setQuestions([...json.data, ...unsavedQuestions]);
     }
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [json]);
 
@@ -87,6 +84,7 @@ export function EditQuizPage() {
     questions.splice(questionIndex, 1);
     setQuestions([...questions]);
     setExpandedItem(-1);
+    toast.success("Question deleted");
   };
   const handleAddOption = (questionIndex: number) => () => {
     const question = questions[questionIndex];
@@ -102,7 +100,7 @@ export function EditQuizPage() {
       questions[questionIndex] = question;
       setQuestions([...questions]);
     } else {
-      alert("A question can have a maximum of 6 options");
+      toast.error("A question can have a maximum of 6 options");
     }
   };
 
@@ -110,7 +108,7 @@ export function EditQuizPage() {
     const question = questions[questionIndex];
 
     if (question.options.length <= 2) {
-      alert("You must have at least 2 options");
+      toast.error("You must have at least 2 options");
       return;
     } else {
       question.options.splice(index, 1);
@@ -126,7 +124,8 @@ export function EditQuizPage() {
       setQuestions([...questions]);
     };
 
-  const addNewQuestion = () => {
+  const addNewQuestion = async () => {
+    if (expandedItem >= 0) await persistQuestion(expandedItem);
     setExpandedItem(questions.length);
 
     setQuestions([
@@ -147,7 +146,7 @@ export function EditQuizPage() {
   const publishQuiz = () => {
     const hasUnsavedItems = questions.some((question) => !("id" in question));
     if (hasUnsavedItems) {
-      alert("Cannot publish unsaved questions.");
+      toast.error("Cannot publish unsaved questions.");
     }
   };
 
@@ -158,7 +157,12 @@ export function EditQuizPage() {
       (option) => option.isAnswer
     );
     if (!hasAtLeastOneAnswer) {
-      if (showError) alert("Must contain at least one answer");
+      if (showError) toast.error("Must contain at least one answer");
+      else {
+        toast.warn(
+          "Could not save because question must contain at least one answer"
+        );
+      }
       return;
     }
 
@@ -169,12 +173,17 @@ export function EditQuizPage() {
       } else {
         newQuestion = await Quiz.createQuestion(question, token as string);
       }
+      if (!newQuestion.data) {
+        toast.error("Error occured while saving question");
+        return;
+      }
 
       questions[qIndex] = newQuestion.data;
       setQuestions([...questions]);
       setExpandedItem(-1);
+      toast.success("Question updated");
     } catch (error) {
-      alert("error occured");
+      toast.error("error occured");
     }
   }
 
@@ -184,8 +193,20 @@ export function EditQuizPage() {
   };
 
   const handleUpdateQuiz = async (e: FormEvent) => {
+    e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
     const title = formData.get("title") as string;
+    const { data } = await Quiz.updateQuiz(
+      quizId,
+      { ...quizJson?.data, title },
+      token
+    );
+
+    if (data) {
+      toast.success("Successfully updated the quiz");
+    }
+
+    refetchQuiz();
   };
 
   const handleDeleteQuiz = async () => {
@@ -204,6 +225,12 @@ export function EditQuizPage() {
             title={quizJson?.data.title || ""}
             deleteQuiz={handleDeleteQuiz}
           />
+          <div className="my-4">
+            <Typography type="p_16">
+              All your changes would be auto saved
+            </Typography>
+          </div>
+
           <EditQuestionAccordion
             onSubmit={saveQuestion}
             questions={questions}

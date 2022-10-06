@@ -4,6 +4,12 @@ export const createQuizInputValidatorSchema = {
   authorId: "required|string",
 };
 
+export const updateQuizInputSchema = {
+  title: "required|string",
+  imageURL: "string",
+  authorId: "required|string",
+};
+
 export const addQuestionInputValidatorSchema = {
   title: "required|string",
   imageURL: "string",

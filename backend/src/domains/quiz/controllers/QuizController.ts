@@ -17,6 +17,7 @@ import {
   retrieveQuizUsecase,
   retrieveSingleQuizUsecase,
   updateQuestionUsecase,
+  updateQuizUsecase,
 } from "../usecases";
 
 const logger = AppLogger.create("Quiz Controller");
@@ -236,6 +237,45 @@ export class QuizController {
       if (error instanceof InvalidInputData) {
         return res.status(400).json({
           message: "Invalid inputs were specified",
+          errors: error.errors,
+        });
+      }
+
+      return handleUnknownError(res, {
+        error,
+        logger,
+      });
+    }
+  }
+
+  public static async updateQuiz(req: AuthRequest, res: Response) {
+    const quizId = req.params.quizId;
+    const userId = req.decoded?.userId as string;
+
+    const quiz = {
+      title: req.body.title,
+      imageURL: req.body.imageURL,
+    };
+    logger.info("Updating Quiz...", { quizId, userId, newQuiz: quiz });
+
+    try {
+      const data = await updateQuizUsecase.execute(userId, quizId, quiz);
+
+      return res.status(200).json({
+        message: "Succesfully updated quiz",
+        data,
+      });
+    } catch (error) {
+      if (error instanceof InvalidInputData) {
+        return res.status(400).json({
+          message: "Invalid inputs were specified",
+          errors: error.errors,
+        });
+      }
+
+      if (error instanceof QuizNotFound) {
+        return res.status(404).json({
+          message: "Quiz you specified was not found",
           errors: error.errors,
         });
       }

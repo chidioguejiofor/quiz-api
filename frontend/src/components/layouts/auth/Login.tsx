@@ -1,4 +1,5 @@
-import React, { SyntheticEvent } from "react";
+import React, { SyntheticEvent, useEffect } from "react";
+import { toast } from "react-toastify";
 import { signIn } from "next-auth/react";
 import { Header } from "components/Header";
 import { FormInput } from "./FormInput";
@@ -8,6 +9,15 @@ import { useRouter } from "next/router";
 
 export function Login() {
   const router = useRouter();
+
+  useEffect(() => {
+    if (router.isReady && router.query.error) {
+      const errorObject = JSON.parse(router.query.error as string);
+      if (errorObject.message) {
+        toast.error(errorObject.message);
+      }
+    }
+  }, [router.isReady, router.query]);
 
   const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -33,12 +43,14 @@ export function Login() {
           type="email"
           name="email"
           placeholder="Enter email address"
+          required
         />
 
         <FormInput
           placeholder="Enter a valid password"
           type="password"
           name="password"
+          required
         />
       </AuthForm>
     </div>
