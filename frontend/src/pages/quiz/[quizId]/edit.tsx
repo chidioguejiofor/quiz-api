@@ -8,12 +8,12 @@ import React from "react";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const session = await getSession(context);
-
+  const quizId = context.params?.quizId as string;
   if (!session) {
     return {
       redirect: {
         permanent: false,
-        destination: pages.login,
+        destination: `${pages.login}?next=/quiz/${quizId}/edit`,
       },
     };
   }

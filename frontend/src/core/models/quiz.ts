@@ -13,6 +13,11 @@ export type BackendResponse<T> = {
   data: T;
 };
 
+export type BackendErrorResponse = {
+  message: string;
+  errors?: Record<string, string[]>;
+};
+
 type Option = {
   id?: string;
   text: string;

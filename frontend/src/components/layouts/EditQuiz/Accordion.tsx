@@ -1,4 +1,3 @@
-import Image from "next/image";
 import React, { ReactNode } from "react";
 
 type AccordionItemProps = {

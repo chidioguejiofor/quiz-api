@@ -13,14 +13,18 @@ import QuizForm from "./QuizForm";
 export function HomePage() {
   const router = useRouter();
   const [user] = useUser();
-  const token = user?.token;
+  const token = user?.token as string;
 
   const [show, setShow] = useState(false);
   const { json: quizesRes, refetch } = useMakeAPICall<
     BackendResponse<QuizData[]>
-  >(router.isReady ? "/user/quiz" : null, {
-    token,
-  });
+  >(
+    router.isReady && token ? "/user/quiz" : null,
+    {
+      token,
+    },
+    true
+  );
 
   const toggleShow = () => setShow(!show);
 
@@ -32,9 +36,14 @@ export function HomePage() {
     const form = e.target as HTMLFormElement;
     const formData = new FormData(form);
     const quizInput = formDataToJSON(formData);
-    await Quiz.createQuiz(quizInput, token as string);
+    await Quiz.createQuiz(quizInput, token);
     refetch();
     form.reset();
+  };
+
+  const handleDelete = async (quizId: string) => {
+    await Quiz.deleteQuiz(quizId, token);
+    refetch();
   };
 
   return (
@@ -48,7 +57,13 @@ export function HomePage() {
         <div className=" ml-16">
           <QuizForm onSubmit={createQuiz} toggleShow={toggleShow} show={show} />
 
-          <CardSection quizes={quizes} />
+          {quizes?.length ? (
+            <CardSection onDelete={handleDelete} quizes={quizes} />
+          ) : null}
+
+          {!quizes?.length && (
+            <Typography type="p_18">No quiz has been created yet. Please create your first Quiz</Typography>
+          )}
         </div>
       </div>
     </>

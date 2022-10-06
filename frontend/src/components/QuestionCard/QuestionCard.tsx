@@ -7,9 +7,11 @@ type QuizCardProps = {
   title: string;
   imageURL?: string;
   quizId: string;
+  onDelete: () => void;
 };
 export function QuizCard(props: QuizCardProps) {
-  const { title, imageURL, quizId } = props;
+  const { title, imageURL, quizId, onDelete } = props;
+ 
   return (
     <div className="w-full md:w-[400px] rounded-md">
       <div className="h-40 relative w-full">
@@ -23,9 +25,29 @@ export function QuizCard(props: QuizCardProps) {
 
       <div className="h-28 border flex items-center px-4 justify-between">
         <Typography type="p_16">{title}</Typography>
-        <Button href={`/quiz/${quizId}/edit`} size="small">
-          Edit
-        </Button>
+
+        <div className="flex">
+          <div className="mr-4 ">
+            <Button href={`/quiz/${quizId}/edit`} size="small">
+              Edit
+            </Button>
+          </div>
+
+          <Button
+            type="cta"
+            htmlType="button"
+            size="small"
+            onClick={onDelete}
+          >
+            <Image
+              alt="Delete Question"
+              src="/delete.png"
+              layout="fixed"
+              width={16}
+              height={16}
+            />
+          </Button>
+        </div>
       </div>
     </div>
   );

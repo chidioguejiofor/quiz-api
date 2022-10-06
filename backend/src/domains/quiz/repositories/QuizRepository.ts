@@ -18,6 +18,25 @@ export class QuizRepository {
     return Quiz.create(input);
   }
 
+  public static async updateQuiz(
+    authorId: string,
+    quizId: string,
+    input: Partial<QuizEntity>
+  ) {
+    const [itemsUpdated, updatedItems] = await Quiz.update(input, {
+      where: {
+        authorId,
+        id: quizId,
+      },
+      returning: true,
+    });
+
+    if (!itemsUpdated) {
+      throw new QuizNotFound();
+    }
+    return updatedItems[0];
+  }
+
   public static async fetchAuthorQuiz(
     authorId: string,
     quizId?: string | string[]

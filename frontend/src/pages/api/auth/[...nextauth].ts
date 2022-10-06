@@ -4,6 +4,7 @@ import { Credentials } from "core/api/types";
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { pages } from "constants/pages";
+import { AxiosError } from "axios";
 
 export default NextAuth({
   pages: {
@@ -60,7 +61,11 @@ export default NextAuth({
             accessTokenExpires: tokenData.exp * 1000,
           } as any;
         } catch (error) {
-          console.log(error);
+          const axiosError = error as AxiosError;
+          if (axiosError.response) {
+            throw new Error(JSON.stringify(axiosError.response?.data));
+          }
+          throw new Error("Some unknown werror occured");
         }
       },
     }),

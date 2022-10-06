@@ -40,6 +40,12 @@ router.get(
   authAPI.tokenMiddleware(),
   QuizController.getSingleQuiz
 );
+
+router.put(
+  "/quiz/:quizId",
+  authAPI.tokenMiddleware(),
+  QuizController.updateQuiz
+);
 router.delete(
   "/quiz/:quizId",
   authAPI.tokenMiddleware(),
