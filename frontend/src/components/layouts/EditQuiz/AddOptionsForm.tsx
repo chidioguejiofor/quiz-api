@@ -11,6 +11,7 @@ type AddOptionsFormProps = {
   options: Option[];
   questionTitle: string;
   onQuestionTitleChange: (e: SyntheticEvent) => void;
+  onSubmit: (e: SyntheticEvent) => void;
   onOptionChange: (newOption: Option, index: number) => void;
   onAddOption: () => void;
   onRemoveOption: (index: number) => void;
@@ -23,6 +24,7 @@ const AddOptionsForm = (props: AddOptionsFormProps) => {
     onRemoveOption,
     onOptionChange,
     onQuestionTitleChange,
+    onSubmit,
   } = props;
 
   const handleOptionChange =
@@ -37,7 +39,7 @@ const AddOptionsForm = (props: AddOptionsFormProps) => {
       onOptionChange({ ...option, [name]: finalValue }, index);
     };
   return (
-    <form>
+    <form onSubmit={onSubmit}>
       <FormInput
         name="title"
         type="text"

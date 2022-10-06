@@ -3,6 +3,7 @@ import { QuizNotFound } from "../errors";
 import { Question } from "../models/question";
 import { Option } from "../models/option";
 import { Quiz } from "../models/quiz";
+import { WhereOptions } from "sequelize";
 
 export class QuizRepository {
   public static async createQuiz(input: QuizEntity): Promise<QuizEntity> {
@@ -20,12 +21,17 @@ export class QuizRepository {
   }
 
   public static async fetchQuestions(
-    quizId: string
+    quizId: string,
+    questionIds?: string | string[]
   ): Promise<QuestionEntity[]> {
+    const where: WhereOptions = {
+      quizId,
+    };
+    if (questionIds) {
+      where["id"] = questionIds;
+    }
     return Question.findAll({
-      where: {
-        quizId,
-      },
+      where,
       include: [
         {
           model: Option,
@@ -39,7 +45,6 @@ export class QuizRepository {
     authorId: string,
     quizId: string
   ): Promise<QuizEntity | null> {
-    console.log("Quiz id==>", quizId);
     return Quiz.findOne({
       where: {
         authorId,

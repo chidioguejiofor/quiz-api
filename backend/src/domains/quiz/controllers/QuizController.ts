@@ -28,7 +28,7 @@ export class QuizController {
       const data = await createQuestionUsecase.execute(userId, question);
 
       return res.status(201).json({
-        message: "Succesfully create quiz",
+        message: "Succesfully created quiz",
         data,
       });
     } catch (error) {
@@ -67,7 +67,7 @@ export class QuizController {
     try {
       const data = await getQuestionUsecase.execute(userId, quizId);
 
-      return res.status(201).json({
+      return res.status(200).json({
         message: "Successfully retrieved questions for quiz",
         data,
       });

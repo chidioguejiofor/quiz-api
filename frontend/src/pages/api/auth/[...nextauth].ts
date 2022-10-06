@@ -4,13 +4,14 @@ import { Credentials } from "core/api/types";
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { pages } from "constants/pages";
+import { signOut } from "next-auth/react";
 
 export default NextAuth({
   pages: {
     error: pages.login,
   },
   callbacks: {
-    async jwt({ token, user, account }) {
+    async jwt({ token, user, account }: any) {
       if (user && account) {
         return {
           ...token,
@@ -20,8 +21,10 @@ export default NextAuth({
           accessTokenExpires: user.accessTokenExpires as number,
         };
       } else {
-        // refreshToken here
-        console.log(token);
+        if (token.accessTokenExpires <= +new Date()) {
+          signOut();
+        }
+
         return token;
       }
     },
@@ -54,7 +57,7 @@ export default NextAuth({
             accessToken: json.accessToken,
             refreshToken: json.refreshToken,
             data: json.data,
-            accessTokenExpires: Date.now() + tokenData.exp,
+            accessTokenExpires: tokenData.exp * 1000,
           } as any;
         } catch (error) {
           console.log(error);
