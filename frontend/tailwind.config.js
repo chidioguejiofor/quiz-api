@@ -20,6 +20,7 @@ module.exports = {
         skyblue: "#7EC8E3",
         navyblue: "#050A30",
         blue: "#0000FF",
+        blue2: "#0000AA",
       },
     },
   },

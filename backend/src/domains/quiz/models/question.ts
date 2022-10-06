@@ -1,4 +1,10 @@
-import { Table, Column, ForeignKey, HasMany } from "sequelize-typescript";
+import {
+  Table,
+  Column,
+  ForeignKey,
+  HasMany,
+  BelongsTo,
+} from "sequelize-typescript";
 import { BaseModel } from "shared/BaseModel";
 import { QuestionEntity } from "../entities";
 import { Option } from "./option";
@@ -34,4 +40,11 @@ export class Question extends BaseModel<QuestionEntity> {
 
   @HasMany(() => Option)
   options: Option[];
+
+  @BelongsTo(() => Quiz)
+  quiz: Quiz;
+
+  get multiChoice() {
+    return this.numberOfAnswers > 1;
+  }
 }

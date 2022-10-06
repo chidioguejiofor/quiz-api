@@ -11,6 +11,7 @@ import {
 import {
   createQuestionUsecase,
   deleteQuestionUsecase,
+  fetchQuestionsByPermalinkUsecase,
   getQuestionUsecase,
   updateQuestionUsecase,
 } from "../usecases";
@@ -71,6 +72,21 @@ export class QuestionController {
 
       return res.status(201).json({
         message: "Succesfully updated question",
+        data,
+      });
+    } catch (error) {
+      return QuestionController.handleQuestionErrors(res, error);
+    }
+  }
+
+  public static async fetchByPermalink(req: AuthRequest, res: Response) {
+    const permalink = req.params.permalink as string;
+
+    try {
+      const data = await fetchQuestionsByPermalinkUsecase.execute(permalink);
+
+      return res.status(201).json({
+        message: "Succesfully retrieved questions",
         data,
       });
     } catch (error) {

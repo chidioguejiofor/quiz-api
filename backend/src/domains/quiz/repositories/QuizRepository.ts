@@ -88,7 +88,29 @@ export class QuizRepository {
       include: [
         {
           model: Option,
-          attributes: ["text", "isAnswer"],
+          attributes: ["id", "text", "isAnswer"],
+        },
+      ],
+    });
+  }
+
+  public static async fetchQuestionByPermalink(
+    permalink: string
+  ): Promise<QuestionEntity[]> {
+    return Question.findAll({
+      include: [
+        {
+          model: Option,
+          attributes: ["id", "text"],
+        },
+
+        {
+          model: Quiz,
+          where: {
+            permalink,
+            status: "published",
+          },
+          attributes: [],
         },
       ],
     });

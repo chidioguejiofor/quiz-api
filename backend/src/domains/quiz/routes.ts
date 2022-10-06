@@ -12,6 +12,13 @@ router.get(
   QuestionController.retrieveQuestions
 );
 
+router.get(
+  "/published/quiz/:permalink/questions",
+  QuestionController.fetchByPermalink
+);
+
+// router.post("/quiz/:permalink/submit", QuestionController.fetchByPermalink);
+
 router.post(
   "/quiz/questions",
   authAPI.tokenMiddleware(),
