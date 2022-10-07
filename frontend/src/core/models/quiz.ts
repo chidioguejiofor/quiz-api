@@ -19,8 +19,8 @@ export type BackendErrorResponse = {
   errors?: Record<string, string[]>;
 };
 
-type Option = {
-  id?: string;
+export type OptionData = {
+  id: string;
   text: string;
   isAnswer: boolean;
 };
@@ -33,7 +33,7 @@ export type QuestionData = {
   title: string;
   imageURL?: string | null;
   numberOfAnswers: number;
-  options: Option[];
+  options: OptionData[];
 };
 
 export type QuestionInput = {
@@ -41,5 +41,5 @@ export type QuestionInput = {
   title: string;
   imageURL?: string | null;
 
-  options: Option[];
+  options: OptionData[];
 };

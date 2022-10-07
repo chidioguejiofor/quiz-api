@@ -10,13 +10,22 @@ import { formDataToJSON } from "utils/formHelpers";
 import CardSection from "./CardSection";
 import QuizForm from "./QuizForm";
 
+const settings = {
+  published: {
+    title: "List of all published quizes",
+  },
+  myQuizes: {
+    title: "List of my quizes",
+  },
+};
+
 export function HomePage() {
   const router = useRouter();
   const [user] = useUser();
   const token = user?.token as string;
 
   const [show, setShow] = useState(false);
-  const { json: quizesRes, refetch } = useMakeAPICall<
+  const { json: userQuizesRes, refetch } = useMakeAPICall<
     BackendResponse<QuizData[]>
   >(
     router.isReady && token ? "/user/quiz" : null,
@@ -26,12 +35,16 @@ export function HomePage() {
     true
   );
 
-  console.log("user==>", user);
+  const [status, setStatus] = useState<keyof typeof settings>("published");
+
+  const { json: publishedQuiz, refetch: refetchPublished } = useMakeAPICall<
+    BackendResponse<QuizData[]>
+  >(router.isReady ? "/published/quiz/" : null, {}, true);
 
   const toggleShow = () => setShow(!show);
 
-  const quizes = quizesRes?.data;
-  const title = quizes?.length ? "List of Quizes" : "Create first Quiz";
+  const quizes =
+    status === "myQuizes" ? userQuizesRes?.data : publishedQuiz?.data;
 
   const createQuiz = async (e: SyntheticEvent) => {
     e.preventDefault();
@@ -40,12 +53,19 @@ export function HomePage() {
     const quizInput = formDataToJSON(formData);
     await Quiz.create(quizInput, token);
     refetch();
+    refetchPublished();
     form.reset();
   };
 
   const handleDelete = async (quizId: string) => {
     await Quiz.delete(quizId, token);
     refetch();
+    refetchPublished();
+  };
+  const handleSelectChange = (e: SyntheticEvent) => {
+    e.preventDefault();
+    const { value } = e.target as HTMLInputElement;
+    setStatus(value as any);
   };
 
   return (
@@ -53,11 +73,21 @@ export function HomePage() {
       <Header />
       <div>
         <div className="mt-2 mb-9 text-center">
-          <Typography type="h3">{title}</Typography>
+          <Typography type="h3">{settings[status].title}</Typography>
         </div>
 
         <div className=" ml-16">
-          <QuizForm onSubmit={createQuiz} toggleShow={toggleShow} show={show} />
+          <select className="py-2 px-2" onChange={handleSelectChange}>
+            {token && <option value="myQuizes">Your Quizes</option>}
+            <option value="published">Published Quizes</option>
+          </select>
+          {token && (
+            <QuizForm
+              onSubmit={createQuiz}
+              toggleShow={toggleShow}
+              show={show}
+            />
+          )}
 
           {quizes?.length ? (
             <CardSection
@@ -67,7 +97,7 @@ export function HomePage() {
             />
           ) : null}
 
-          {!quizes?.length && (
+          {token && !quizes?.length && (
             <Typography type="p_18">
               No quiz has been created yet. Please create your first Quiz
             </Typography>
