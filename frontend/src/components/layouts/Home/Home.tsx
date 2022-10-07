@@ -77,10 +77,6 @@ export function HomePage() {
         </div>
 
         <div className=" ml-16">
-          <select className="py-2 px-2" onChange={handleSelectChange}>
-            {token && <option value="myQuizes">Your Quizes</option>}
-            <option value="published">Published Quizes</option>
-          </select>
           {token && (
             <QuizForm
               onSubmit={createQuiz}
@@ -88,6 +84,11 @@ export function HomePage() {
               show={show}
             />
           )}
+
+          <select className="py-2 px-2 mb-4" onChange={handleSelectChange}>
+            {token && <option value="myQuizes">Your Quizes</option>}
+            <option value="published">Published Quizes</option>
+          </select>
 
           {quizes?.length ? (
             <CardSection
