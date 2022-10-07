@@ -17,7 +17,9 @@ router.get(
   QuestionController.fetchByPermalink
 );
 
-// router.post("/quiz/:permalink/submit", QuestionController.fetchByPermalink);
+router.get("/published/quiz", QuizController.fetchPublishedQuizes);
+
+router.post("/quiz/:permalink/submit", QuizController.submitQuizAnswers);
 
 router.post(
   "/quiz/questions",

@@ -1,4 +1,4 @@
-import { Response } from "express";
+import { Request, Response } from "express";
 import { InvalidInputData } from "shared/errors";
 import { AppLogger } from "shared/logger";
 import { AuthRequest } from "shared/types";
@@ -11,9 +11,11 @@ import {
 import {
   createQuizUsecase,
   deleteQuizUsecase,
+  getPublishedQuizUsecase,
   publishQuizUsecase,
   retrieveQuizUsecase,
   retrieveSingleQuizUsecase,
+  submitQuizUsecase,
   updateQuizUsecase,
 } from "../usecases";
 
@@ -48,6 +50,37 @@ export class QuizController {
 
       return res.status(201).json({
         message: "Succesfully published quiz",
+        data,
+      });
+    } catch (error) {
+      return QuizController.handleErrors(error, res);
+    }
+  }
+
+  public static async fetchPublishedQuizes(req: Request, res: Response) {
+    logger.info("Retrieving Quiz...");
+
+    try {
+      const data = await getPublishedQuizUsecase.execute();
+
+      return res.status(200).json({
+        message: "Succesfully retrieved published quiz",
+        data,
+      });
+    } catch (error) {
+      return QuizController.handleErrors(error, res);
+    }
+  }
+
+  public static async submitQuizAnswers(req: AuthRequest, res: Response) {
+    const permalink = req.params?.permalink as string;
+    const userAnswers = req.body.userAnswers;
+
+    try {
+      const data = await submitQuizUsecase.execute(permalink, userAnswers);
+
+      return res.status(201).json({
+        message: "Succesfully got quiz results",
         data,
       });
     } catch (error) {

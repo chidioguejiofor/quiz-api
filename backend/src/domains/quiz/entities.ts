@@ -15,6 +15,11 @@ export interface QuestionEntity extends BaseEntity {
   numberOfAnswers: number;
 }
 
+export interface QuizSubmissionEntity extends BaseEntity {
+  result: Record<string, string>;
+  quizId: string;
+}
+
 export interface OptionEntity extends BaseEntity {
   text: string;
   isAnswer: boolean;

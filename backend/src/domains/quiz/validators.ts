@@ -11,8 +11,12 @@ export const updateQuizInputSchema = {
 };
 
 export const publishQuizSchema = {
-  quizId: "string",
+  quizId: "required|string",
   authorId: "required|string",
+};
+
+export const submitQuizSchema = {
+  permalink: "required|string",
 };
 
 export const addQuestionInputValidatorSchema = {

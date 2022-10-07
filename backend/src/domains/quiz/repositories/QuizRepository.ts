@@ -73,6 +73,15 @@ export class QuizRepository {
     });
   }
 
+  public static async fetchPublishedQuiz(): Promise<QuizEntity[]> {
+    return Quiz.findAll({
+      where: {
+        status: "published",
+        
+      },
+    });
+  }
+
   public static async fetchQuestions(
     quizId: string,
     questionIds?: string | string[]
@@ -95,13 +104,14 @@ export class QuizRepository {
   }
 
   public static async fetchQuestionByPermalink(
-    permalink: string
-  ): Promise<QuestionEntity[]> {
+    permalink: string,
+    optionAttributes = ["id", "text"]
+  ) {
     return Question.findAll({
       include: [
         {
           model: Option,
-          attributes: ["id", "text"],
+          attributes: optionAttributes,
         },
 
         {

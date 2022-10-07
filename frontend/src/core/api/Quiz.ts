@@ -6,6 +6,20 @@ type QuizInput = {
 };
 
 export class Quiz {
+  public static async submitQuiz(
+    permalink: string,
+    userAnswers: Record<string, string[]>
+  ) {
+    try {
+      const res = await axiosInstance.post(`/quiz/${permalink}/submit`, {
+        userAnswers,
+      });
+
+      return res.data;
+    } catch (error) {
+      return apiCallErrorHandler(error);
+    }
+  }
   public static async publish(quizId: string, token: string) {
     try {
       const res = await axiosInstance.post(`/quiz/${quizId}/publish`, null, {

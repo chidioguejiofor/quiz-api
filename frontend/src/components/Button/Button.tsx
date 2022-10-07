@@ -9,6 +9,7 @@ const BUTTON_SIZES = {
 const BUTTON_TYPES = {
   cta: "bg-red-600 hover:bg-red text-white focus-visible:ring-red focus-visible:ring-2 focus-visible:ring-offset-2 text-btn_14 ",
   skyblue: "text-black bg-skyblue",
+  green: "text-white bg-green-600",
   outlined: "text-black border border-skyblue",
 };
 

@@ -1,17 +1,32 @@
 import { Button } from "components/Button";
 import React from "react";
 
-export function Controls() {
+type ControlsProps = {
+  onNextQuestion: () => void;
+  onPrevQuestion: () => void;
+  isLastQuestion: boolean;
+};
+export function Controls(props: ControlsProps) {
   return (
     <div className="  mt-10">
       <div className="flex">
-        <Button type="outlined" size="normal">
+        <Button
+          htmlType="button"
+          type="outlined"
+          size="normal"
+          onClick={props.onPrevQuestion}
+        >
           Previous
         </Button>
 
         <div className="ml-4 ">
-          <Button type="skyblue" size="normal">
-            Next
+          <Button
+            htmlType="button"
+            type={props.isLastQuestion ? "green" : "skyblue"}
+            size="normal"
+            onClick={props.onNextQuestion}
+          >
+            {props.isLastQuestion ? "Submit" : "Next"}
           </Button>
         </div>
       </div>

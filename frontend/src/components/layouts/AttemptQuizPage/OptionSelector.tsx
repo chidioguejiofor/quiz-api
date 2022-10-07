@@ -17,14 +17,16 @@ type OptionSelectorProps = {
   children: string;
   state?: keyof typeof optionStatuses;
   multichoice?: boolean;
+  onClick?: () => void;
 };
 export const OptionSelector = (props: OptionSelectorProps) => {
-  const { state = "inactive", multichoice = false } = props;
+  const { state = "inactive", multichoice = false, onClick } = props;
   const settings = optionStatuses[state];
   const imgSrc = multichoice ? settings.checkImage : settings.radioImage;
   return (
     <button
-      className={`border w-full pl-4 mb-5   text-left border-[#B4B4B4] flex items-center  h-16 rounded-lg ${settings.className}`}
+      className={`border w-full pl-4 mb-5 text-left border-[#B4B4B4] flex items-center  h-16 rounded-lg ${settings.className}`}
+      onClick={onClick}
     >
       <Image
         alt="Checkmark"
