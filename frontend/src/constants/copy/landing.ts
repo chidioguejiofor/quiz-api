@@ -1,6 +1,6 @@
 export const marketing = {
   title: "Welcome to ProfQuiz!",
   subtitle:
-    "Examine how best you fit the world of tech by answering tech related questions that would improve your skill",
-  btnLabel: "Take a Quiz",
+    "See how well you can build exciting questionaires that are fun to play with. Our UI makes this possible",
+  btnLabel: "Create a Quiz",
 };

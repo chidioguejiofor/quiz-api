@@ -14,8 +14,8 @@ export function Signup() {
     const formData = new FormData(e.target as HTMLFormElement);
     const signupInput: any = {};
     formData.forEach((value, key) => (signupInput[key] = value));
-    const { data } = await Auth.signup(signupInput);
-    if (data) {
+    const { errors } = await Auth.signup(signupInput);
+    if (!errors) {
       router.push(pages.login);
     }
   };
